@@ -15,7 +15,7 @@ export default function Header() {
         <p>show nav</p>
       </button>
       <p className="w-full text-center">Header</p>
-      <div className=" border-b border-my-text-dark "></div>
+      <div className="absolute w-full h-full border-b border-my-text-dark pointer-events-none"></div>
     </header>
   );
 }
