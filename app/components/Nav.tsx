@@ -11,7 +11,7 @@ export default function Nav() {
     <div
       className={
         (isNavOpen ? "translate-x" : "-translate-x-60") +
-        " w-1/6 top-0 bg-my-very-dark sticky flex flex-col shadow-md transition-all duration-500 ease-in-out"
+        " w-1/6 top-14 bottom-0 bg-my-very-dark fixed flex flex-col shadow-md transition-all duration-500 ease-in-out"
       }
     >
       <ul>

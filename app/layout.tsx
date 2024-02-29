@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ContextWrapper from "./components/ContextWrapper";
 import Header from "./components/Header";
+import Nav from "./components/Nav";
+import UserList from "./components/UserList";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,7 +23,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ContextWrapper>
           <Header />
+          <Nav />
           {children}
+          <UserList />
         </ContextWrapper>
       </body>
     </html>
