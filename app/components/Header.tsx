@@ -12,7 +12,7 @@ export default function Header() {
         onClick={() => setIsNavOpen(!isNavOpen)}
         className="bg-my-text-dark px-2 ml-4 py-1 text-center text-nowrap rounded-md hover:bg-my-accent transition-colors duration-300"
       >
-        <p>show nav</p>
+        <div>show nav</div>
       </button>
       <p className="w-full text-center">Header</p>
       <div className="absolute w-full h-full border-b border-my-text-dark pointer-events-none"></div>

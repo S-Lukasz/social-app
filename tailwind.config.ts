@@ -14,6 +14,7 @@ const config: Config = {
       "my-dark": "#16171b",
       "my-front-items": "#222327",
       "my-light": "#2a2a2e",
+      "my-very-light": "#3b3b41",
       "my-accent": "#6a9ae7",
       "my-text-light": "#c7c7c7",
       "my-text-medium": "#8d8d8e",

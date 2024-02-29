@@ -7,9 +7,19 @@ export interface INavContext {
   setIsNavOpen: Dispatch<SetStateAction<boolean>>;
 }
 
+export interface IPostContext {
+  isNewPostActive: boolean;
+  setIsNewPostActive: Dispatch<SetStateAction<boolean>>;
+}
+
 export const NavContext = createContext<INavContext>({
   isNavOpen: false,
   setIsNavOpen: () => {},
+});
+
+export const PostContext = createContext<IPostContext>({
+  isNewPostActive: false,
+  setIsNewPostActive: () => {},
 });
 
 export default function RootLayout({
@@ -18,15 +28,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isNewPostActive, setIsNewPostActive] = useState(false);
 
   return (
-    <NavContext.Provider
+    <PostContext.Provider
       value={{
-        isNavOpen,
-        setIsNavOpen,
+        isNewPostActive,
+        setIsNewPostActive,
       }}
     >
-      {children}
-    </NavContext.Provider>
+      <NavContext.Provider
+        value={{
+          isNavOpen,
+          setIsNavOpen,
+        }}
+      >
+        {children}
+      </NavContext.Provider>
+    </PostContext.Provider>
   );
 }

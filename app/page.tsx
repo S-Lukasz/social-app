@@ -4,18 +4,37 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ActiveUser from "./components/ActiveUser";
 import Nav from "./components/Nav";
 import Post from "./components/Post";
-import { USERS, USER_POST_ITEMS } from "./consts";
+import { USERS, USER_POST_ITEMS, UserPostItem } from "./consts";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons/faMagnifyingGlass";
+import NewPostPopup from "./components/NewPostPopup";
+import { useContext, useEffect, useState } from "react";
+import { PostContext } from "./components/ContextWrapper";
 
 export default function Home() {
+  const { setIsNewPostActive } = useContext(PostContext);
+
+  const [posts, setPosts] = useState<UserPostItem[]>([]);
+
+  useEffect(() => {
+    setPosts(USER_POST_ITEMS);
+  }, []);
+
+  function onNewPostAdded(newPost: UserPostItem) {
+    posts.unshift(newPost);
+  }
+
   return (
     <main className=" bg-my-dark flex min-h-screen justify-between">
+      <NewPostPopup onNewPostAdded={onNewPostAdded}></NewPostPopup>
       <Nav></Nav>
       <div className="flex flex-col my-20 gap-10 w-1/3">
-        <button className="flex items-center bg-my-light rounded-md p-4 hover:bg-my-front-items duration-300 transition-colors hover:text-my-accent ">
+        <button
+          onClick={() => setIsNewPostActive(true)}
+          className="flex items-center bg-my-light rounded-md p-4 hover:bg-my-front-items duration-300 transition-colors hover:text-my-accent "
+        >
           <div className="flex items-center m-auto gap-2 font-medium text-lg">
-            <FontAwesomeIcon icon={faPlus} /> <p>Add new post</p>
+            <FontAwesomeIcon icon={faPlus} /> <div>Add new post</div>
           </div>
         </button>
         {USER_POST_ITEMS.map((post, i) => (

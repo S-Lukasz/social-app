@@ -18,7 +18,7 @@ export default function ActiveUser({ user }: Props) {
       <div
         className={
           (user.isActive ? "bg-[#3bce4e]" : "bg-my-text-dark") +
-          " left-11 top-10 absolute h-4 w-4 rounded-full shadow-md border  border-my-light "
+          " left-11 top-10 absolute h-4 w-4 rounded-full shadow-md border-2  border-my-light "
         }
       ></div>
       <p className="mb-3">
