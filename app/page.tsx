@@ -7,10 +7,17 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useEffect, useState } from "react";
 import { PostContext } from "./components/ContextWrapper";
 import { USER_POST_ITEMS, UserPostItem } from "./consts";
+import PostSelected from "./components/PostSelected";
+import useDisableScroll from "./hooks/useDisableScroll";
 
 export default function Home() {
   const { setIsNewPostActive } = useContext(PostContext);
+
   const [posts, setPosts] = useState<UserPostItem[]>([]);
+  const [postSelected, setPostSelected] = useState<UserPostItem>();
+
+  const { setIsPostSelected } = useContext(PostContext);
+  const { setScrollBlocked } = useDisableScroll();
 
   useEffect(() => {
     setPosts(USER_POST_ITEMS);
@@ -20,13 +27,30 @@ export default function Home() {
     posts.unshift(newPost);
   }
 
+  function onPostSelected(post: UserPostItem) {
+    setPostSelected(post);
+    setIsPostSelected(true);
+    setScrollBlocked(true);
+  }
+
   return (
     <main className=" bg-my-dark flex min-h-screen justify-between">
-      <NewPostPopup onNewPostAdded={onNewPostAdded}></NewPostPopup>
+      <NewPostPopup
+        setScrollBlocked={setScrollBlocked}
+        onNewPostAdded={onNewPostAdded}
+      ></NewPostPopup>
+
+      <PostSelected
+        setScrollBlocked={setScrollBlocked}
+        post={postSelected}
+      ></PostSelected>
 
       <div className="flex flex-col my-10 gap-10 w-1/3 m-auto">
         <button
-          onClick={() => setIsNewPostActive(true)}
+          onClick={() => {
+            setScrollBlocked(true);
+            setIsNewPostActive(true);
+          }}
           className="flex items-center bg-my-light rounded-md p-4 hover:bg-my-front-items duration-300 transition-colors hover:text-my-accent "
         >
           <div className="flex items-center m-auto gap-2 font-medium text-lg">
@@ -34,7 +58,11 @@ export default function Home() {
           </div>
         </button>
         {USER_POST_ITEMS.map((post, i) => (
-          <Post key={"post_key_" + i} post={post}></Post>
+          <Post
+            key={"post_key_" + i}
+            post={post}
+            onPostSelected={onPostSelected}
+          ></Post>
         ))}
       </div>
     </main>

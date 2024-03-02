@@ -21,6 +21,7 @@ import {
 import useClickOutside from "../hooks/useClickOutside";
 
 interface Props {
+  onPostSelected: (post: UserPostItem) => void;
   post: UserPostItem;
 }
 
@@ -42,7 +43,7 @@ interface CommentsProps {
   post: UserPostItem;
 }
 
-export default function Post({ post }: Props) {
+export default function Post({ onPostSelected, post }: Props) {
   const {
     ref,
     isOpen: showLikesView,
@@ -54,7 +55,6 @@ export default function Post({ post }: Props) {
   const [postComments, setPostComments] = useState(post.comments.length);
 
   const userData = USERS[post.userId];
-  const showImg = () => {};
 
   function onLikeAdd() {
     if (!post.likes.includes(CurrentUser.id)) post.likes.push(CurrentUser.id);
@@ -102,7 +102,7 @@ export default function Post({ post }: Props) {
       <div className="bg-my-front-items m-4 rounded-md flex flex-col">
         <p className="p-4 break-words">{post.description}</p>
         <button
-          onClick={() => showImg()}
+          onClick={() => onPostSelected(post)}
           className={!post.imageUrl ? "hidden" : "w-full h-full "}
         >
           <img

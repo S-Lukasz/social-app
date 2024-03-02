@@ -3,15 +3,26 @@
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClose, faUpload } from "@fortawesome/free-solid-svg-icons";
-import { FormEvent, useContext, useEffect, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { PostContext } from "./ContextWrapper";
 import { CurrentUser, UserPostItem } from "../consts";
 
 interface Props {
+  setScrollBlocked: Dispatch<SetStateAction<boolean>>;
   onNewPostAdded: (user: UserPostItem) => void;
 }
 
-export default function NewPostPopup({ onNewPostAdded }: Props) {
+export default function NewPostPopup({
+  setScrollBlocked,
+  onNewPostAdded,
+}: Props) {
   const { isNewPostActive, setIsNewPostActive } = useContext(PostContext);
 
   const [show, setShow] = useState(false);
@@ -39,6 +50,7 @@ export default function NewPostPopup({ onNewPostAdded }: Props) {
       comments: [],
     };
 
+    setScrollBlocked(false);
     onNewPostAdded(post);
     setIsNewPostActive(false);
   }
@@ -67,6 +79,7 @@ export default function NewPostPopup({ onNewPostAdded }: Props) {
             onClick={() => {
               setShow(false);
               setShowItems(false);
+              setScrollBlocked(false);
               setIsNewPostActive(false);
             }}
           >

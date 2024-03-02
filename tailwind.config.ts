@@ -21,6 +21,9 @@ const config: Config = {
       "my-text-dark": "#5c5c5c",
     },
     extend: {
+      boxShadow: {
+        bottom: "0px 8px 8px -4px rgba(0, 0, 0, 0.1)",
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":

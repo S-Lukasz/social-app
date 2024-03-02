@@ -8,8 +8,10 @@ export interface INavContext {
 }
 
 export interface IPostContext {
+  isPostSelected: boolean;
   isNewPostActive: boolean;
   setIsNewPostActive: Dispatch<SetStateAction<boolean>>;
+  setIsPostSelected: Dispatch<SetStateAction<boolean>>;
 }
 
 export const NavContext = createContext<INavContext>({
@@ -18,8 +20,10 @@ export const NavContext = createContext<INavContext>({
 });
 
 export const PostContext = createContext<IPostContext>({
+  isPostSelected: false,
   isNewPostActive: false,
   setIsNewPostActive: () => {},
+  setIsPostSelected: () => {},
 });
 
 export default function RootLayout({
@@ -29,12 +33,15 @@ export default function RootLayout({
 }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isNewPostActive, setIsNewPostActive] = useState(false);
+  const [isPostSelected, setIsPostSelected] = useState(false);
 
   return (
     <PostContext.Provider
       value={{
         isNewPostActive,
+        isPostSelected,
         setIsNewPostActive,
+        setIsPostSelected,
       }}
     >
       <NavContext.Provider
