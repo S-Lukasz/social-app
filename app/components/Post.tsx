@@ -19,6 +19,7 @@ import {
   useState,
 } from "react";
 import useClickOutside from "../hooks/useClickOutside";
+import Link from "next/link";
 
 interface Props {
   onPostSelected: (post: UserPostItem) => void;
@@ -85,15 +86,21 @@ export default function Post({ onPostSelected, post }: Props) {
         icon={faEllipsis}
       />
       <div className="flex">
-        <img
-          className="w-10 h-10 rounded-full mt-6 ml-6 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-          src={userData.avatarUrl}
-          alt={"avatar_user_" + userData.id}
-        />
+        <Link href={`/users/${userData.id}`} className="">
+          <img
+            className="w-10 h-10 rounded-full mt-6 ml-6 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+            src={userData.avatarUrl}
+            alt={"avatar_user_" + userData.id}
+          />
+        </Link>
+
         <div className=" mt-5 flex flex-col">
-          <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
+          <Link
+            href={`/users/${userData.id}`}
+            className="text-my-accent hover:text-my-text-light duration-300 transition-colors font-medium"
+          >
             {userData.name} {userData.surname}
-          </p>
+          </Link>
           <p className="text-my-text-light text-sm">
             {post.date.toDateString()}
           </p>
@@ -176,11 +183,14 @@ function Comments({ showComments, post }: CommentsProps) {
           >
             <div className={showComments ? "flex flex-col" : "hidden"}>
               <div className="flex">
-                <img
-                  className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-                  src={commentUserData.avatarUrl}
-                  alt={"avatar_user_" + commentUserData.id}
-                />
+                <Link href={`/users/${commentUserData.id}`} className="">
+                  <img
+                    className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+                    src={commentUserData.avatarUrl}
+                    alt={"avatar_user_" + commentUserData.id}
+                  />
+                </Link>
+
                 <div className=" mt-1 flex flex-col">
                   <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
                     {commentUserData.name} {commentUserData.surname}

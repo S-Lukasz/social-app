@@ -1,3 +1,12 @@
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faBars, faGear, faUser } from "@fortawesome/free-solid-svg-icons";
+
+export enum NavItemType {
+  UserProfile,
+  UserSettings,
+  Other,
+}
+
 export interface User {
   id: number;
   isActive: boolean;
@@ -6,14 +15,19 @@ export interface User {
   surname: string;
   description: string;
   avatarUrl: string;
+  friends: number[];
 }
 
 export interface UserNavItem {
   name: string;
+  icon: IconDefinition;
   description: string;
+  hasBreakLine: boolean;
+  type: NavItemType;
 }
 
 export interface UserPostItem {
+  id: number;
   userId: number;
   likes: number[];
   date: Date;
@@ -36,8 +50,10 @@ export const CurrentUser: User = {
   isActive: true,
   name: "Grzegorz",
   surname: "Wiejniecki",
-  description: "Love yourself..",
+  description:
+    "Description of the user, can be a little bit longer than name..",
   avatarUrl: "/avatars/avatar_temp.png",
+  friends: [],
 };
 
 export const USERS: User[] = [
@@ -47,8 +63,10 @@ export const USERS: User[] = [
     isActive: true,
     name: "Grzegorz",
     surname: "Wiejniecki",
-    description: "Love yourself..",
+    description:
+      "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
+    friends: [1, 2],
   },
   {
     id: 1,
@@ -56,8 +74,10 @@ export const USERS: User[] = [
     isActive: true,
     name: "Andrzej",
     surname: "Brochmucki",
-    description: "I like cats.",
+    description:
+      "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
+    friends: [0],
   },
   {
     id: 2,
@@ -65,8 +85,10 @@ export const USERS: User[] = [
     isActive: true,
     name: "Anna",
     surname: "Starzec",
-    description: "I like dogs.",
+    description:
+      "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
+    friends: [1],
   },
   {
     id: 3,
@@ -74,28 +96,61 @@ export const USERS: User[] = [
     isActive: false,
     name: "Benedykt",
     surname: "Wieniec",
-    description: "I am special specialist at UJ.",
+    description:
+      "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
+    friends: [],
   },
 ];
 
 export const USER_NAV_ITEMS: UserNavItem[] = [
   {
-    name: "User item 1",
-    description: "User nav item description, so can be longer",
+    name: "My profile",
+    description: "Edit photos, manage friends and create new posts.",
+    hasBreakLine: false,
+    type: NavItemType.UserProfile,
+    icon: faUser,
   },
   {
     name: "User item 2",
     description: "User nav item description, so can be longer",
+    hasBreakLine: true,
+    type: NavItemType.UserSettings,
+    icon: faGear,
   },
   {
-    name: "User item 2",
+    name: "User item 3",
     description: "User nav item description, so can be longer",
+    hasBreakLine: false,
+    type: NavItemType.Other,
+    icon: faBars,
+  },
+  {
+    name: "User item 4",
+    description: "User nav item description, so can be longer",
+    hasBreakLine: false,
+    type: NavItemType.Other,
+    icon: faBars,
+  },
+  {
+    name: "User item 3",
+    description: "User nav item description, so can be longer",
+    hasBreakLine: true,
+    type: NavItemType.Other,
+    icon: faBars,
+  },
+  {
+    name: "User item 4",
+    description: "User nav item description, so can be longer",
+    hasBreakLine: false,
+    type: NavItemType.Other,
+    icon: faBars,
   },
 ];
 
 export const USER_POST_ITEMS: UserPostItem[] = [
   {
+    id: 0,
     userId: 0,
     likes: [1, 2, 0, 3],
     date: new Date(),
@@ -126,6 +181,7 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     ],
   },
   {
+    id: 1,
     userId: 0,
     likes: [1],
     date: new Date(),
@@ -159,6 +215,7 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     ],
   },
   {
+    id: 2,
     userId: 2,
     likes: [1, 0, 3],
     date: new Date(),
@@ -174,6 +231,7 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     ],
   },
   {
+    id: 3,
     userId: 1,
     likes: [1, 2, 3],
     date: new Date(),

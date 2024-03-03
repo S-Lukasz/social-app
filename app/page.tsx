@@ -4,7 +4,7 @@ import Post from "./components/Post";
 import NewPostPopup from "./components/NewPostPopup";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 import { PostContext } from "./components/ContextWrapper";
 import { USER_POST_ITEMS, UserPostItem } from "./consts";
 import PostSelected from "./components/PostSelected";
@@ -13,25 +13,34 @@ import useDisableScroll from "./hooks/useDisableScroll";
 export default function Home() {
   const { setIsNewPostActive } = useContext(PostContext);
 
-  const [posts, setPosts] = useState<UserPostItem[]>([]);
-  const [postSelected, setPostSelected] = useState<UserPostItem>();
+  const [posts, setPosts] = useState<UserPostItem[]>(USER_POST_ITEMS);
+  const [postSelectedId, setPostSelectedId] = useState<number>();
 
   const { setIsPostSelected } = useContext(PostContext);
   const { setScrollBlocked } = useDisableScroll();
 
-  useEffect(() => {
-    setPosts(USER_POST_ITEMS);
-  }, []);
-
   function onNewPostAdded(newPost: UserPostItem) {
-    posts.unshift(newPost);
+    const postsUpdated = [newPost, ...posts];
+    setPosts(postsUpdated);
+  }
+
+  function onPostUpdated(updatedPost: UserPostItem) {
+    const postsUpdated = posts.map((post) =>
+      post.id === updatedPost.id ? updatedPost : post
+    );
+    setPosts(postsUpdated);
   }
 
   function onPostSelected(post: UserPostItem) {
-    setPostSelected(post);
+    setPostSelectedId(post.id);
     setIsPostSelected(true);
     setScrollBlocked(true);
   }
+
+  const postSelected = useMemo(
+    () => posts.find((post) => post.id === postSelectedId),
+    [posts, postSelectedId]
+  );
 
   return (
     <main className=" bg-my-dark flex min-h-screen justify-between">
@@ -42,6 +51,7 @@ export default function Home() {
 
       <PostSelected
         setScrollBlocked={setScrollBlocked}
+        onPostUpdated={onPostUpdated}
         post={postSelected}
       ></PostSelected>
 
@@ -57,7 +67,8 @@ export default function Home() {
             <FontAwesomeIcon icon={faPlus} /> <div>Add new post</div>
           </div>
         </button>
-        {USER_POST_ITEMS.map((post, i) => (
+
+        {posts.map((post, i) => (
           <Post
             key={"post_key_" + i}
             post={post}

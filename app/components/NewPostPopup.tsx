@@ -12,7 +12,7 @@ import {
   useState,
 } from "react";
 import { PostContext } from "./ContextWrapper";
-import { CurrentUser, UserPostItem } from "../consts";
+import { CurrentUser, USER_POST_ITEMS, UserPostItem } from "../consts";
 
 interface Props {
   setScrollBlocked: Dispatch<SetStateAction<boolean>>;
@@ -43,6 +43,7 @@ export default function NewPostPopup({
 
   function createPost() {
     const post: UserPostItem = {
+      id: USER_POST_ITEMS.length,
       userId: CurrentUser.id,
       likes: [],
       date: new Date(),

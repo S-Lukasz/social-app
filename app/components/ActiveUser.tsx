@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import Link from "next/link";
 import { User } from "../consts";
 
 interface Props {
@@ -9,7 +10,10 @@ interface Props {
 
 export default function ActiveUser({ user }: Props) {
   return (
-    <div className="bg-my-light relative flex items-center p-4 rounded-md w-full cursor-pointer duration-300 transition-all hover:bg-my-front-items text-my-accent hover:text-my-text-light">
+    <Link
+      href={`/users/${user.id}`}
+      className="bg-my-light relative flex items-center p-4 rounded-md w-full duration-300 transition-all hover:bg-my-front-items text-my-accent hover:text-my-text-light"
+    >
       <img
         className="w-10 h-10 rounded-full mr-4"
         src={user.avatarUrl}
@@ -24,6 +28,6 @@ export default function ActiveUser({ user }: Props) {
       <p className="mb-3">
         {user.name} {user.surname}
       </p>
-    </div>
+    </Link>
   );
 }

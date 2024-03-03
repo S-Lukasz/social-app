@@ -13,6 +13,7 @@ import {
 import {
   Dispatch,
   FormEvent,
+  RefObject,
   SetStateAction,
   useContext,
   useEffect,
@@ -26,15 +27,17 @@ import useClickOutside from "../hooks/useClickOutside";
 
 interface Props {
   post: UserPostItem | undefined;
+  onPostUpdated: (updatedPost: UserPostItem) => void;
   setScrollBlocked: Dispatch<SetStateAction<boolean>>;
 }
 
 interface CommentsProps {
+  commentsRef: RefObject<HTMLDivElement>;
   post: UserPostItem;
 }
 
 interface UserCommentProps {
-  setPostComments: Dispatch<SetStateAction<number | undefined>>;
+  onPostUpdated: (updatedPost: UserPostItem) => void;
   post: UserPostItem;
 }
 
@@ -46,7 +49,11 @@ interface LikesProps {
   refToSet: any;
 }
 
-export default function PostSelected({ setScrollBlocked, post }: Props) {
+export default function PostSelected({
+  onPostUpdated,
+  setScrollBlocked,
+  post,
+}: Props) {
   const {
     ref,
     isOpen: showLikesView,
@@ -55,15 +62,13 @@ export default function PostSelected({ setScrollBlocked, post }: Props) {
 
   const { isPostSelected, setIsPostSelected } = useContext(PostContext);
 
-  const [postComments, setPostComments] = useState(post?.comments.length);
-  const [postLikes, setPostLikes] = useState(post?.likes.length);
+  const commentsScrollListRef = useRef<HTMLDivElement>(null);
+  const [scrollHeight, setScrollHeight] = useState(0);
+  const maxScrollHeight = 500;
 
   useEffect(() => {
-    if (post) {
-      setPostComments(post.comments.length);
-      setPostLikes(post.likes.length);
-    }
-  }, [post]);
+    setScrollHeight(commentsScrollListRef?.current?.scrollHeight ?? 0);
+  }, [post, commentsScrollListRef]);
 
   if (!post) return <></>;
 
@@ -73,13 +78,17 @@ export default function PostSelected({ setScrollBlocked, post }: Props) {
     if (!post) return;
 
     if (!post.likes.includes(CurrentUser.id)) {
-      post?.likes.push(CurrentUser.id);
+      const newLike = CurrentUser.id;
+      const postClone = { ...post };
+      postClone.likes = [...postClone.likes, newLike];
+
+      onPostUpdated(postClone);
     } else {
       const index = post.likes.indexOf(CurrentUser.id);
       if (index > -1) post.likes.splice(index, 1);
-    }
 
-    setPostLikes(post.likes.length);
+      onPostUpdated(post);
+    }
   }
 
   return (
@@ -110,8 +119,15 @@ export default function PostSelected({ setScrollBlocked, post }: Props) {
         />
       </div>
 
-      <div className="flex w-1/4 bg-my-front-items">
-        <div className="bg-my-light rounded-md relative w-full">
+      <div className="flex w-1/4 bg-my-front-items relative ">
+        <UserComment post={post} onPostUpdated={onPostUpdated}></UserComment>
+
+        <div
+          className={
+            (scrollHeight >= maxScrollHeight ? "overflow-y-scroll" : "") +
+            " bg-my-light rounded-md relative w-full  mb-64"
+          }
+        >
           <FontAwesomeIcon
             className="h-5 w-5 absolute top-4 right-6 text-my-text-light hover:text-[white] cursor-pointer"
             icon={faEllipsis}
@@ -131,11 +147,9 @@ export default function PostSelected({ setScrollBlocked, post }: Props) {
               </p>
             </div>
           </div>
-
           <div className="bg-my-front-items m-4 rounded-md flex flex-col">
             <p className="p-4 break-words">{post?.description}</p>
           </div>
-
           <div className="flex justify-between">
             <div className="flex pl-6 pb-3 items-center gap-2 ">
               <button onClick={() => onLikeAdd()}>
@@ -154,21 +168,15 @@ export default function PostSelected({ setScrollBlocked, post }: Props) {
                 setShowLikesView={setShowLikesView}
                 showLikesView={showLikesView}
                 refToSet={ref}
-                postLikes={postLikes}
                 post={post}
               ></LikesAndUsers>
             </div>
             <div className="flex pr-6 pb-3 items-center gap-2">
-              {postComments}
+              {post.comments.length}
               <FontAwesomeIcon icon={faComment}></FontAwesomeIcon>
             </div>
           </div>
-
-          <Comments post={post}></Comments>
-          <UserComment
-            post={post}
-            setPostComments={setPostComments}
-          ></UserComment>
+          <Comments commentsRef={commentsScrollListRef} post={post}></Comments>
         </div>
       </div>
     </div>
@@ -179,7 +187,6 @@ function LikesAndUsers({
   setShowLikesView,
   refToSet,
   showLikesView,
-  postLikes,
   post,
 }: LikesProps) {
   const maxLikeItemCount = 3;
@@ -191,7 +198,7 @@ function LikesAndUsers({
           onClick={() => setShowLikesView(!showLikesView)}
           className="hover:text-my-accent duration-300 transition-all"
         >
-          {postLikes}
+          {post.likes.length}
         </button>
 
         <div
@@ -202,7 +209,7 @@ function LikesAndUsers({
         >
           <div
             className={
-              postLikes !== 0 || !showLikesView
+              post.likes.length !== 0 || !showLikesView
                 ? "hidden"
                 : "basis-full shrink-0"
             }
@@ -246,28 +253,16 @@ function LikesAndUsers({
   );
 }
 
-function Comments({ post }: CommentsProps) {
+function Comments({ commentsRef, post }: CommentsProps) {
   const [loadLimit, setLoadLimit] = useState(3);
-  const commentsScrollListRef = useRef<HTMLDivElement>(null);
-  const maxScrollHeight = 400;
   const loadOffset = 3;
 
   return (
     <div className="flex flex-col relative items-center">
-      <div className="absolute -top-4 min-h-4 min-w-[29rem] mr-2 shadow-bottom shadow-my-very-dark"></div>
-
       <div
-        ref={commentsScrollListRef}
-        className={
-          (!commentsScrollListRef ||
-          commentsScrollListRef?.current?.scrollHeight == 0 ||
-          commentsScrollListRef?.current?.scrollHeight >= maxScrollHeight
-            ? "overflow-y-scroll"
-            : "") +
-          " flex flex-col bg-my-light gap-2 mb-4 mt-2 max-h-[25rem] w-full transition-all duration-300"
-        }
+        ref={commentsRef}
+        className="flex flex-col bg-my-light gap-2 mb-4 mt-2 w-full transition-all duration-300"
       >
-        scrollHeight: {commentsScrollListRef?.current?.scrollHeight}
         {post.comments.slice(0, loadLimit).map((comment, i) => {
           const commentUserData = USERS[comment.userId];
           return (
@@ -318,7 +313,7 @@ function Comments({ post }: CommentsProps) {
   );
 }
 
-function UserComment({ post, setPostComments }: UserCommentProps) {
+function UserComment({ post, onPostUpdated }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
 
   useEffect(() => {
@@ -330,15 +325,22 @@ function UserComment({ post, setPostComments }: UserCommentProps) {
   function createComment(newDescription: string) {
     if (!post) return;
 
-    const comment: PostComment = {
+    const newComment: PostComment = {
       userId: CurrentUser.id,
       likes: 0,
       date: new Date(),
       description: newDescription,
     };
 
-    post.comments.push(comment);
-    setPostComments(post.comments.length);
+    const postClone = { ...post, comments: [...post.comments, newComment] };
+    console.log(
+      "newComment: ",
+      newComment,
+      "postClone.comments ",
+      postClone.comments
+    );
+
+    onPostUpdated(postClone);
   }
 
   function onDescriptionChange(e: FormEvent<HTMLTextAreaElement>) {
@@ -350,7 +352,7 @@ function UserComment({ post, setPostComments }: UserCommentProps) {
     <div>
       <div
         className={
-          "bg-my-very-light p-2 absolute bottom-0 w-11/12 rounded-md mx-4 transition-all duration-300 mb-4"
+          "bg-my-very-light z-40 p-2 absolute bottom-0 w-11/12 rounded-md mx-4 transition-all duration-300 mb-4"
         }
       >
         <div className={"flex flex-col gap-4"}>
