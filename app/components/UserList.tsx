@@ -1,11 +1,14 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { USERS } from "../consts";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import ActiveUser from "./ActiveUser";
+import { useContext } from "react";
+import { UserContext } from "./ContextWrapper";
 
 export default function UserList() {
+  const { users } = useContext(UserContext);
+
   return (
     <div className="w-1/6 bg-my-very-dark fixed top-0 bottom-0 right-0">
       <div className=" text-center w-full text-xl mt-4 ">
@@ -26,7 +29,7 @@ export default function UserList() {
           />
         </div>
 
-        {USERS.map((user, i) => (
+        {users.map((user, i) => (
           <ActiveUser key={"active_user_key_" + i} user={user}></ActiveUser>
         ))}
       </div>

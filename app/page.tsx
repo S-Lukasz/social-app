@@ -6,30 +6,16 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { PostContext } from "./components/ContextWrapper";
-import { USER_POST_ITEMS, UserPostItem } from "./consts";
+import { UserPostItem } from "./consts";
 import PostSelected from "./components/PostSelected";
 import useDisableScroll from "./hooks/useDisableScroll";
 
 export default function Home() {
-  const { setIsNewPostActive } = useContext(PostContext);
-
-  const [posts, setPosts] = useState<UserPostItem[]>(USER_POST_ITEMS);
   const [postSelectedId, setPostSelectedId] = useState<number>();
 
-  const { setIsPostSelected } = useContext(PostContext);
   const { setScrollBlocked } = useDisableScroll();
-
-  function onNewPostAdded(newPost: UserPostItem) {
-    const postsUpdated = [newPost, ...posts];
-    setPosts(postsUpdated);
-  }
-
-  function onPostUpdated(updatedPost: UserPostItem) {
-    const postsUpdated = posts.map((post) =>
-      post.id === updatedPost.id ? updatedPost : post
-    );
-    setPosts(postsUpdated);
-  }
+  const { setIsPostSelected, onPostUpdated, setIsNewPostActive, posts } =
+    useContext(PostContext);
 
   function onPostSelected(post: UserPostItem) {
     setPostSelectedId(post.id);
@@ -44,10 +30,7 @@ export default function Home() {
 
   return (
     <main className=" bg-my-dark flex min-h-screen justify-between">
-      <NewPostPopup
-        setScrollBlocked={setScrollBlocked}
-        onNewPostAdded={onNewPostAdded}
-      ></NewPostPopup>
+      <NewPostPopup setScrollBlocked={setScrollBlocked}></NewPostPopup>
 
       <PostSelected
         setScrollBlocked={setScrollBlocked}

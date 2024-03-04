@@ -1,10 +1,27 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faBars, faGear, faUser } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBars,
+  faCake,
+  faCalendar,
+  faGear,
+  faGlobe,
+  faHouse,
+  faSuitcase,
+  faUser,
+} from "@fortawesome/free-solid-svg-icons";
 
 export enum NavItemType {
   UserProfile,
   UserSettings,
   Other,
+}
+
+export enum UserProfileInfoType {
+  Date,
+  Birthday,
+  Job,
+  Place,
+  Website,
 }
 
 export interface User {
@@ -44,6 +61,40 @@ export interface PostComment {
   description: string;
 }
 
+export interface UserProfileData {
+  info?: string;
+  type: UserProfileInfoType;
+  icon: IconDefinition;
+}
+
+export const UserProfileData: UserProfileData[] = [
+  {
+    info: new Date().toDateString(),
+    type: UserProfileInfoType.Date,
+    icon: faCalendar,
+  },
+  {
+    info: new Date().toDateString(),
+    type: UserProfileInfoType.Birthday,
+    icon: faCake,
+  },
+  {
+    info: "DHL Express",
+    type: UserProfileInfoType.Job,
+    icon: faSuitcase,
+  },
+  {
+    info: "Warsaw",
+    type: UserProfileInfoType.Place,
+    icon: faHouse,
+  },
+  {
+    info: "www.about-me.com",
+    type: UserProfileInfoType.Website,
+    icon: faGlobe,
+  },
+];
+
 export const CurrentUser: User = {
   id: 0,
   age: 16,
@@ -53,21 +104,11 @@ export const CurrentUser: User = {
   description:
     "Description of the user, can be a little bit longer than name..",
   avatarUrl: "/avatars/avatar_temp.png",
-  friends: [],
+  friends: [1, 3],
 };
 
 export const USERS: User[] = [
-  {
-    id: 0,
-    age: 16,
-    isActive: true,
-    name: "Grzegorz",
-    surname: "Wiejniecki",
-    description:
-      "Description of the user, can be a little bit longer than name..",
-    avatarUrl: "/avatars/avatar_temp.png",
-    friends: [1, 2],
-  },
+  CurrentUser,
   {
     id: 1,
     age: 28,
@@ -77,7 +118,7 @@ export const USERS: User[] = [
     description:
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
-    friends: [0],
+    friends: [0, 1],
   },
   {
     id: 2,
@@ -88,7 +129,7 @@ export const USERS: User[] = [
     description:
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
-    friends: [1],
+    friends: [1, 3, 2],
   },
   {
     id: 3,
@@ -101,6 +142,17 @@ export const USERS: User[] = [
     avatarUrl: "/avatars/avatar_temp.png",
     friends: [],
   },
+  {
+    id: 4,
+    age: 38,
+    isActive: false,
+    name: "Wojciech",
+    surname: "Sardyniec",
+    description:
+      "Description of the user, can be a little bit longer than name..",
+    avatarUrl: "/avatars/avatar_temp.png",
+    friends: [2, 3, 4],
+  },
 ];
 
 export const USER_NAV_ITEMS: UserNavItem[] = [
@@ -112,7 +164,7 @@ export const USER_NAV_ITEMS: UserNavItem[] = [
     icon: faUser,
   },
   {
-    name: "User item 2",
+    name: "Settings",
     description: "User nav item description, so can be longer",
     hasBreakLine: true,
     type: NavItemType.UserSettings,

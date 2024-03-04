@@ -11,23 +11,24 @@ import {
   useEffect,
   useState,
 } from "react";
-import { PostContext } from "./ContextWrapper";
-import { CurrentUser, USER_POST_ITEMS, UserPostItem } from "../consts";
+import { PostContext, UserContext } from "./ContextWrapper";
+import { UserPostItem } from "../consts";
 
 interface Props {
   setScrollBlocked: Dispatch<SetStateAction<boolean>>;
-  onNewPostAdded: (user: UserPostItem) => void;
 }
 
-export default function NewPostPopup({
-  setScrollBlocked,
-  onNewPostAdded,
-}: Props) {
-  const { isNewPostActive, setIsNewPostActive } = useContext(PostContext);
+export default function NewPostPopup({ setScrollBlocked }: Props) {
+  const { isNewPostActive, posts, setIsNewPostActive, onNewPostAdded } =
+    useContext(PostContext);
+
+  const { loggedUser } = useContext(UserContext);
 
   const [show, setShow] = useState(false);
   const [showItems, setShowItems] = useState(false);
   const [postDescription, setPostDescription] = useState("");
+
+  const maxCharCount = 500;
 
   useEffect(() => {
     if (isNewPostActive) {
@@ -42,9 +43,9 @@ export default function NewPostPopup({
   }, [isNewPostActive]);
 
   function createPost() {
-    const post: UserPostItem = {
-      id: USER_POST_ITEMS.length,
-      userId: CurrentUser.id,
+    const newPost: UserPostItem = {
+      id: posts.length,
+      userId: loggedUser.id,
       likes: [],
       date: new Date(),
       description: postDescription,
@@ -52,7 +53,7 @@ export default function NewPostPopup({
     };
 
     setScrollBlocked(false);
-    onNewPostAdded(post);
+    onNewPostAdded(newPost);
     setIsNewPostActive(false);
   }
 
@@ -104,11 +105,22 @@ export default function NewPostPopup({
               <FontAwesomeIcon icon={faUpload}></FontAwesomeIcon>
               <p>Upload image</p>
             </button>
+            <p
+              className={
+                (postDescription.length > maxCharCount
+                  ? " text-[#e43e3e] "
+                  : "text-my-text-light ") + "ml-auto pt-1 pr-4"
+              }
+            >
+              {postDescription.length} / {maxCharCount}
+            </p>
             <button
-              disabled={postDescription === ""}
+              disabled={
+                postDescription === "" || postDescription.length > maxCharCount
+              }
               onClick={() => createPost()}
               className={
-                (postDescription === ""
+                (postDescription === "" || postDescription.length > maxCharCount
                   ? "pointer-events-none bg-my-light text-my-text-medium"
                   : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-very-light") +
                 " flex  px-4 py-1 rounded-md gap-2 items-center"

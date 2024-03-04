@@ -8,7 +8,6 @@ import {
   faComment,
   faEllipsis,
   faHeart,
-  faUpload,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   Dispatch,
@@ -17,12 +16,11 @@ import {
   SetStateAction,
   useContext,
   useEffect,
-  useMemo,
   useRef,
   useState,
 } from "react";
-import { PostContext } from "./ContextWrapper";
-import { CurrentUser, PostComment, USERS, UserPostItem } from "../consts";
+import { PostContext, UserContext } from "./ContextWrapper";
+import { PostComment, User, UserPostItem } from "../consts";
 import useClickOutside from "../hooks/useClickOutside";
 
 interface Props {
@@ -34,10 +32,12 @@ interface Props {
 interface CommentsProps {
   commentsRef: RefObject<HTMLDivElement>;
   post: UserPostItem;
+  users: User[];
 }
 
 interface UserCommentProps {
   onPostUpdated: (updatedPost: UserPostItem) => void;
+  loggedUser: User;
   post: UserPostItem;
 }
 
@@ -47,6 +47,7 @@ interface LikesProps {
   postLikes?: number;
   post: UserPostItem;
   refToSet: any;
+  users: User[];
 }
 
 export default function PostSelected({
@@ -61,10 +62,11 @@ export default function PostSelected({
   } = useClickOutside();
 
   const { isPostSelected, setIsPostSelected } = useContext(PostContext);
+  const { loggedUser, users } = useContext(UserContext);
 
   const commentsScrollListRef = useRef<HTMLDivElement>(null);
   const [scrollHeight, setScrollHeight] = useState(0);
-  const maxScrollHeight = 500;
+  const maxScrollHeight = 450;
 
   useEffect(() => {
     setScrollHeight(commentsScrollListRef?.current?.scrollHeight ?? 0);
@@ -72,19 +74,19 @@ export default function PostSelected({
 
   if (!post) return <></>;
 
-  const userData = USERS[post.userId];
+  const userData = users[post.userId];
 
   function onLikeAdd() {
     if (!post) return;
 
-    if (!post.likes.includes(CurrentUser.id)) {
-      const newLike = CurrentUser.id;
+    if (!post.likes.includes(loggedUser.id)) {
+      const newLike = loggedUser.id;
       const postClone = { ...post };
       postClone.likes = [...postClone.likes, newLike];
 
       onPostUpdated(postClone);
     } else {
-      const index = post.likes.indexOf(CurrentUser.id);
+      const index = post.likes.indexOf(loggedUser.id);
       if (index > -1) post.likes.splice(index, 1);
 
       onPostUpdated(post);
@@ -120,7 +122,11 @@ export default function PostSelected({
       </div>
 
       <div className="flex w-1/4 bg-my-front-items relative ">
-        <UserComment post={post} onPostUpdated={onPostUpdated}></UserComment>
+        <UserComment
+          loggedUser={loggedUser}
+          post={post}
+          onPostUpdated={onPostUpdated}
+        ></UserComment>
 
         <div
           className={
@@ -155,7 +161,7 @@ export default function PostSelected({
               <button onClick={() => onLikeAdd()}>
                 <FontAwesomeIcon
                   className={
-                    (post?.likes.includes(CurrentUser.id)
+                    (post?.likes.includes(loggedUser.id)
                       ? "text-[#e45858] hover:text-[white]"
                       : "text-[white] hover:text-[#e45858]") +
                     " duration-300 transition-all hover:scale-[0.95] hover:rotate-12"
@@ -169,6 +175,7 @@ export default function PostSelected({
                 showLikesView={showLikesView}
                 refToSet={ref}
                 post={post}
+                users={users}
               ></LikesAndUsers>
             </div>
             <div className="flex pr-6 pb-3 items-center gap-2">
@@ -176,7 +183,11 @@ export default function PostSelected({
               <FontAwesomeIcon icon={faComment}></FontAwesomeIcon>
             </div>
           </div>
-          <Comments commentsRef={commentsScrollListRef} post={post}></Comments>
+          <Comments
+            users={users}
+            commentsRef={commentsScrollListRef}
+            post={post}
+          ></Comments>
         </div>
       </div>
     </div>
@@ -188,6 +199,7 @@ function LikesAndUsers({
   refToSet,
   showLikesView,
   post,
+  users,
 }: LikesProps) {
   const maxLikeItemCount = 3;
 
@@ -221,7 +233,7 @@ function LikesAndUsers({
             className={showLikesView ? " w-full flex flex-col gap-2" : "hidden"}
           >
             {post.likes.map((like, index) => {
-              const userData = USERS[like];
+              const userData = users[like];
               return (
                 <li key={index}>
                   <button className="w-full h-full p-4 flex gap-3 items-center rounded-md bg-my-light hover:bg-my-front-items transition-colors duration-300 text-my-accent hover:text-my-text-light">
@@ -253,7 +265,7 @@ function LikesAndUsers({
   );
 }
 
-function Comments({ commentsRef, post }: CommentsProps) {
+function Comments({ commentsRef, post, users }: CommentsProps) {
   const [loadLimit, setLoadLimit] = useState(3);
   const loadOffset = 3;
 
@@ -264,7 +276,7 @@ function Comments({ commentsRef, post }: CommentsProps) {
         className="flex flex-col bg-my-light gap-2 mb-4 mt-2 w-full transition-all duration-300"
       >
         {post.comments.slice(0, loadLimit).map((comment, i) => {
-          const commentUserData = USERS[comment.userId];
+          const commentUserData = users[comment.userId];
           return (
             <div
               key={"comment_key_" + i + "_on_post_" + comment.userId}
@@ -313,7 +325,7 @@ function Comments({ commentsRef, post }: CommentsProps) {
   );
 }
 
-function UserComment({ post, onPostUpdated }: UserCommentProps) {
+function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
 
   useEffect(() => {
@@ -326,20 +338,13 @@ function UserComment({ post, onPostUpdated }: UserCommentProps) {
     if (!post) return;
 
     const newComment: PostComment = {
-      userId: CurrentUser.id,
+      userId: loggedUser.id,
       likes: 0,
       date: new Date(),
       description: newDescription,
     };
 
     const postClone = { ...post, comments: [...post.comments, newComment] };
-    console.log(
-      "newComment: ",
-      newComment,
-      "postClone.comments ",
-      postClone.comments
-    );
-
     onPostUpdated(postClone);
   }
 
@@ -359,12 +364,12 @@ function UserComment({ post, onPostUpdated }: UserCommentProps) {
           <div className="flex">
             <img
               className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-              src={CurrentUser.avatarUrl}
-              alt={"avatar_user_" + CurrentUser.id}
+              src={loggedUser.avatarUrl}
+              alt={"avatar_user_" + loggedUser.id}
             />
             <div className=" mt-1 flex flex-col">
               <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
-                {CurrentUser.name} {CurrentUser.surname}
+                {loggedUser.name} {loggedUser.surname}
               </p>
               <p className="text-my-text-light text-sm">
                 {post.date.toDateString()}

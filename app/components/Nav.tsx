@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext } from "react";
-import { CurrentUser, NavItemType, USER_NAV_ITEMS } from "../consts";
+import { NavItemType, USER_NAV_ITEMS } from "../consts";
 import { NavContext } from "./ContextWrapper";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +19,7 @@ export default function Nav() {
     <div
       className={
         (isNavOpen ? "translate-x" : "-translate-x-60") +
-        " w-1/6 top-14 bottom-0 bg-my-very-dark fixed flex flex-col shadow-md transition-all duration-500 ease-in-out"
+        " w-1/6 top-14 bottom-0 bg-my-very-dark fixed flex flex-col shadow-md transition-all duration-500 ease-in-out z-10"
       }
     >
       <ul>
@@ -33,8 +33,8 @@ export default function Nav() {
               <div className={item.hasBreakLine ? "flex" : "hidden"}>
                 <div
                   className={
-                    (isNavOpen ? "w-5/6 ml-auto mr-5" : "w-3 ml-auto mr-8") +
-                    " h-3 bg-my-text-medium rounded-full mb-2 transition-all duration-500 ease-in-out"
+                    (isNavOpen ? "w-5/6 ml-auto mr-5" : "w-2 ml-auto mr-8") +
+                    " h-2 bg-my-accent rounded-full mb-2 transition-all duration-500 ease-in-out"
                   }
                 />
               </div>
@@ -55,8 +55,8 @@ export default function Nav() {
 
                   <div
                     className={
-                      (isNavOpen ? "left-5" : "left-[16.7rem]") +
-                      " mt-3 absolute transition-all duration-500 ease-in-out"
+                      (isNavOpen ? "left-6" : "left-[16.7rem]") +
+                      " mt-4 absolute transition-all duration-500 ease-in-out"
                     }
                   >
                     <FontAwesomeIcon
@@ -78,7 +78,7 @@ export default function Nav() {
                 >
                   <p
                     className={
-                      "ml-12 whitespace-normal line-clamp-2 h-[2lh] group-hover:text-my-text-light duration-300 transition-colors"
+                      "ml-12 mt-1 whitespace-normal line-clamp-2 h-[2lh] group-hover:text-my-text-light duration-300 transition-colors"
                     }
                   >
                     {item.description}

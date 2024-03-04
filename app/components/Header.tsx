@@ -2,11 +2,13 @@
 "use client";
 
 import { useContext } from "react";
-import { NavContext, PostContext } from "./ContextWrapper";
+import { NavContext, PostContext, UserContext } from "./ContextWrapper";
 import Link from "next/link";
-import { CurrentUser } from "../consts";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faS } from "@fortawesome/free-solid-svg-icons";
 
 export default function Header() {
+  const { loggedUser } = useContext(UserContext);
   const { isNavOpen, setIsNavOpen } = useContext(NavContext);
   const { isPostSelected } = useContext(PostContext);
 
@@ -24,8 +26,8 @@ export default function Header() {
       >
         <img
           className="w-8 h-8 rounded-full"
-          src={CurrentUser.avatarUrl}
-          alt={"avatar_user_" + CurrentUser.id}
+          src={loggedUser.avatarUrl}
+          alt={"avatar_user_" + loggedUser.id}
         />
       </button>
 
@@ -37,9 +39,15 @@ export default function Header() {
       </button> */}
       <Link
         href={"/"}
-        className=" m-auto text-center bg-my-accent rounded-md px-4 py-1 font-medium hover:bg-my-very-light transition-colors duration-300"
+        className=" m-auto items-center justify-center flex text-center gap-2 "
       >
-        Social App
+        <FontAwesomeIcon
+          className="bg-my-accent rounded-md px-3 py-1 text-xl font-semibold hover:bg-my-very-light transition-colors duration-300"
+          icon={faS}
+        ></FontAwesomeIcon>
+        {/* <span className="bg-my-accent rounded-md px-4 py-1 font-semibold hover:bg-my-very-light transition-colors duration-300">
+          Social-App
+        </span> */}
       </Link>
       <div className="absolute w-full h-full border-b border-my-text-dark pointer-events-none"></div>
     </header>

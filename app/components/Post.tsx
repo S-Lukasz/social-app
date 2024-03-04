@@ -2,7 +2,7 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { CurrentUser, USERS, UserPostItem, PostComment } from "../consts";
+import { UserPostItem, PostComment, User } from "../consts";
 import {
   faChevronDown,
   faClose,
@@ -13,13 +13,13 @@ import {
 import {
   Dispatch,
   FormEvent,
-  MutableRefObject,
   SetStateAction,
-  useRef,
+  useContext,
   useState,
 } from "react";
 import useClickOutside from "../hooks/useClickOutside";
 import Link from "next/link";
+import { PostContext, UserContext } from "./ContextWrapper";
 
 interface Props {
   onPostSelected: (post: UserPostItem) => void;
@@ -29,19 +29,21 @@ interface Props {
 interface LikesProps {
   setShowLikesView: Dispatch<SetStateAction<boolean>>;
   showLikesView: boolean;
-  postLikes: number;
   post: UserPostItem;
+  users: User[];
   refToSet: any;
 }
 
 interface UserCommentProps {
   createComment: (newDescription: string) => void;
+  loggedUser: User;
   post: UserPostItem;
 }
 
 interface CommentsProps {
   showComments: boolean;
   post: UserPostItem;
+  users: User[];
 }
 
 export default function Post({ onPostSelected, post }: Props) {
@@ -52,31 +54,43 @@ export default function Post({ onPostSelected, post }: Props) {
   } = useClickOutside();
 
   const [showComments, setShowComments] = useState(false);
-  const [postLikes, setPostLikes] = useState(post.likes.length);
-  const [postComments, setPostComments] = useState(post.comments.length);
 
-  const userData = USERS[post.userId];
+  const { onPostUpdated } = useContext(PostContext);
+  const { loggedUser, users } = useContext(UserContext);
+
+  const userData = users[post.userId];
 
   function onLikeAdd() {
-    if (!post.likes.includes(CurrentUser.id)) post.likes.push(CurrentUser.id);
-    else {
-      const index = post.likes.indexOf(CurrentUser.id);
-      if (index > -1) post.likes.splice(index, 1);
-    }
+    if (!post) return;
 
-    setPostLikes(post.likes.length);
+    console.log("onLikeAdd", post.likes);
+
+    if (!post.likes.includes(loggedUser.id)) {
+      const newLike = loggedUser.id;
+      const postClone = { ...post };
+      postClone.likes = [...postClone.likes, newLike];
+
+      onPostUpdated(postClone);
+    } else {
+      const index = post.likes.indexOf(loggedUser.id);
+      if (index > -1) post.likes.splice(index, 1);
+
+      onPostUpdated(post);
+    }
   }
 
   function createComment(newDescription: string) {
-    const comment: PostComment = {
-      userId: CurrentUser.id,
+    if (!post) return;
+
+    const newComment: PostComment = {
+      userId: loggedUser.id,
       likes: 0,
       date: new Date(),
       description: newDescription,
     };
 
-    post.comments.push(comment);
-    setPostComments(post.comments.length);
+    const postClone = { ...post, comments: [...post.comments, newComment] };
+    onPostUpdated(postClone);
   }
 
   return (
@@ -124,7 +138,7 @@ export default function Post({ onPostSelected, post }: Props) {
           <button onClick={() => onLikeAdd()}>
             <FontAwesomeIcon
               className={
-                (post.likes.includes(CurrentUser.id)
+                (post.likes.includes(loggedUser.id)
                   ? "text-[#e45858] hover:text-[white]"
                   : "text-[white] hover:text-[#e45858]") +
                 " duration-300 transition-all hover:scale-[0.95] hover:rotate-12"
@@ -137,7 +151,7 @@ export default function Post({ onPostSelected, post }: Props) {
             setShowLikesView={setShowLikesView}
             showLikesView={showLikesView}
             refToSet={ref}
-            postLikes={postLikes}
+            users={users}
             post={post}
           ></LikesAndUsers>
         </div>
@@ -145,21 +159,28 @@ export default function Post({ onPostSelected, post }: Props) {
           onClick={() => setShowComments(!showComments)}
           className="flex pr-6 pb-3 items-center gap-2"
         >
-          {postComments}
+          {post.comments.length}
           <FontAwesomeIcon
             className="hover:text-my-accent duration-300 transition-all hover:scale-[0.95] hover:rotate-12 cursor-pointer"
             icon={faComment}
           ></FontAwesomeIcon>
         </button>
       </div>
-
-      <Comments showComments={showComments} post={post}></Comments>
-      <UserComment createComment={createComment} post={post}></UserComment>
+      <Comments
+        showComments={showComments}
+        post={post}
+        users={users}
+      ></Comments>
+      <UserComment
+        loggedUser={loggedUser}
+        createComment={createComment}
+        post={post}
+      ></UserComment>
     </div>
   );
 }
 
-function Comments({ showComments, post }: CommentsProps) {
+function Comments({ showComments, post, users }: CommentsProps) {
   const [loadLimit, setLoadLimit] = useState(3);
   const loadOffset = 3;
 
@@ -171,7 +192,7 @@ function Comments({ showComments, post }: CommentsProps) {
       }
     >
       {post.comments.slice(0, loadLimit).map((comment, i) => {
-        const commentUserData = USERS[comment.userId];
+        const commentUserData = users[comment.userId];
         return (
           <div
             key={"comment_key_" + i + "_on_post_" + comment.userId}
@@ -224,7 +245,7 @@ function Comments({ showComments, post }: CommentsProps) {
   );
 }
 
-function UserComment({ post, createComment }: UserCommentProps) {
+function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
   const [showUserComment, setShowUserComment] = useState(false);
 
@@ -253,12 +274,12 @@ function UserComment({ post, createComment }: UserCommentProps) {
           <div className="flex">
             <img
               className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-              src={CurrentUser.avatarUrl}
-              alt={"avatar_user_" + CurrentUser.id}
+              src={loggedUser.avatarUrl}
+              alt={"avatar_user_" + loggedUser.id}
             />
             <div className=" mt-1 flex flex-col">
               <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
-                {CurrentUser.name} {CurrentUser.surname}
+                {loggedUser.name} {loggedUser.surname}
               </p>
               <p className="text-my-text-light text-sm">
                 {post.date.toDateString()}
@@ -310,7 +331,7 @@ function LikesAndUsers({
   setShowLikesView,
   refToSet,
   showLikesView,
-  postLikes,
+  users,
   post,
 }: LikesProps) {
   const maxLikeItemCount = 3;
@@ -322,7 +343,7 @@ function LikesAndUsers({
           onClick={() => setShowLikesView(!showLikesView)}
           className="hover:text-my-accent duration-300 transition-all"
         >
-          {postLikes}
+          {post.likes.length}
         </button>
 
         <div
@@ -333,7 +354,7 @@ function LikesAndUsers({
         >
           <div
             className={
-              postLikes !== 0 || !showLikesView
+              post.likes.length !== 0 || !showLikesView
                 ? "hidden"
                 : "basis-full shrink-0"
             }
@@ -345,7 +366,7 @@ function LikesAndUsers({
             className={showLikesView ? " w-full flex flex-col gap-2" : "hidden"}
           >
             {post.likes.map((like, index) => {
-              const userData = USERS[like];
+              const userData = users[like];
               return (
                 <li key={index}>
                   <button className="w-full h-full p-4 flex gap-3 items-center rounded-md bg-my-light hover:bg-my-front-items transition-colors duration-300 text-my-accent hover:text-my-text-light">

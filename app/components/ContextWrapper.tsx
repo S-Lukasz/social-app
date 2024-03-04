@@ -1,6 +1,21 @@
 "use client";
 
 import { Dispatch, SetStateAction, createContext, useState } from "react";
+import {
+  CurrentUser,
+  USERS,
+  USER_POST_ITEMS,
+  User,
+  UserPostItem,
+} from "../consts";
+
+export interface IUserContext {
+  users: User[];
+  loggedUser: User;
+  onUserUpdated: (updatedUser: User) => void;
+  setUsers: Dispatch<SetStateAction<User[]>>;
+  setloggedUser: Dispatch<SetStateAction<User>>;
+}
 
 export interface INavContext {
   isNavOpen: boolean;
@@ -10,9 +25,21 @@ export interface INavContext {
 export interface IPostContext {
   isPostSelected: boolean;
   isNewPostActive: boolean;
+  posts: UserPostItem[];
+  onPostUpdated: (updatedPost: UserPostItem) => void;
+  onNewPostAdded: (updatedPost: UserPostItem) => void;
   setIsNewPostActive: Dispatch<SetStateAction<boolean>>;
   setIsPostSelected: Dispatch<SetStateAction<boolean>>;
+  setPosts: Dispatch<SetStateAction<UserPostItem[]>>;
 }
+
+export const UserContext = createContext<IUserContext>({
+  users: USERS,
+  loggedUser: CurrentUser,
+  onUserUpdated: () => {},
+  setloggedUser: () => {},
+  setUsers: () => {},
+});
 
 export const NavContext = createContext<INavContext>({
   isNavOpen: false,
@@ -22,8 +49,12 @@ export const NavContext = createContext<INavContext>({
 export const PostContext = createContext<IPostContext>({
   isPostSelected: false,
   isNewPostActive: false,
+  posts: [],
+  onPostUpdated: () => {},
+  onNewPostAdded: () => {},
   setIsNewPostActive: () => {},
   setIsPostSelected: () => {},
+  setPosts: () => {},
 });
 
 export default function RootLayout({
@@ -34,24 +65,63 @@ export default function RootLayout({
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isNewPostActive, setIsNewPostActive] = useState(false);
   const [isPostSelected, setIsPostSelected] = useState(false);
+  const [loggedUser, setloggedUser] = useState(CurrentUser);
+  const [users, setUsers] = useState<User[]>(USERS);
+  const [posts, setPosts] = useState<UserPostItem[]>(USER_POST_ITEMS);
+
+  function onNewPostAdded(newPost: UserPostItem) {
+    const postsUpdated = [newPost, ...posts];
+    setPosts(postsUpdated);
+  }
+
+  function onPostUpdated(updatedPost: UserPostItem) {
+    const postsUpdated = posts.map((post) =>
+      post.id === updatedPost.id ? updatedPost : post
+    );
+    setPosts(postsUpdated);
+  }
+
+  function onUserUpdated(updatedUser: User) {
+    const usersUpdated = users.map((user) =>
+      user.id === updatedUser.id ? updatedUser : user
+    );
+
+    if (updatedUser.id === loggedUser.id) setloggedUser(updatedUser);
+
+    setUsers(usersUpdated);
+  }
 
   return (
-    <PostContext.Provider
+    <UserContext.Provider
       value={{
-        isNewPostActive,
-        isPostSelected,
-        setIsNewPostActive,
-        setIsPostSelected,
+        users,
+        loggedUser,
+        setUsers,
+        setloggedUser,
+        onUserUpdated,
       }}
     >
-      <NavContext.Provider
+      <PostContext.Provider
         value={{
-          isNavOpen,
-          setIsNavOpen,
+          isNewPostActive,
+          isPostSelected,
+          posts,
+          onPostUpdated,
+          onNewPostAdded,
+          setIsNewPostActive,
+          setIsPostSelected,
+          setPosts,
         }}
       >
-        {children}
-      </NavContext.Provider>
-    </PostContext.Provider>
+        <NavContext.Provider
+          value={{
+            isNavOpen,
+            setIsNavOpen,
+          }}
+        >
+          {children}
+        </NavContext.Provider>
+      </PostContext.Provider>
+    </UserContext.Provider>
   );
 }
