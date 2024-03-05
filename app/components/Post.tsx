@@ -2,9 +2,16 @@
 "use client";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { UserPostItem, PostComment, User } from "../consts";
 import {
-  faChevronDown,
+  UserPostItem,
+  PostComment,
+  User,
+  PostOptions,
+  PostOptionData,
+  PostOptionUserType,
+  PostOptionType,
+} from "../consts";
+import {
   faClose,
   faComment,
   faEllipsis,
@@ -15,22 +22,24 @@ import {
   FormEvent,
   SetStateAction,
   useContext,
+  useEffect,
   useState,
 } from "react";
 import useClickOutside from "../hooks/useClickOutside";
 import Link from "next/link";
 import { PostContext, UserContext } from "./ContextWrapper";
+import PostComments from "./PostComments";
+import LikesAndUsers from "./LikesAndUsers";
 
 interface Props {
   onPostSelected: (post: UserPostItem) => void;
   post: UserPostItem;
 }
 
-interface LikesProps {
-  setShowLikesView: Dispatch<SetStateAction<boolean>>;
-  showLikesView: boolean;
+interface PostOptionsProps {
+  setShowOptionsView: Dispatch<SetStateAction<boolean>>;
+  showOptionsView: boolean;
   post: UserPostItem;
-  users: User[];
   refToSet: any;
 }
 
@@ -40,17 +49,16 @@ interface UserCommentProps {
   post: UserPostItem;
 }
 
-interface CommentsProps {
-  showComments: boolean;
-  post: UserPostItem;
-  users: User[];
-}
-
 export default function Post({ onPostSelected, post }: Props) {
   const {
-    ref,
+    ref: likesRef,
     isOpen: showLikesView,
     setIsOpen: setShowLikesView,
+  } = useClickOutside();
+  const {
+    ref: optionsRef,
+    isOpen: showOptionsView,
+    setIsOpen: setShowOptionsView,
   } = useClickOutside();
 
   const [showComments, setShowComments] = useState(false);
@@ -60,31 +68,13 @@ export default function Post({ onPostSelected, post }: Props) {
 
   const userData = users[post.userId];
 
-  function onLikeAdd() {
-    if (!post) return;
-
-    console.log("onLikeAdd", post.likes);
-
-    if (!post.likes.includes(loggedUser.id)) {
-      const newLike = loggedUser.id;
-      const postClone = { ...post };
-      postClone.likes = [...postClone.likes, newLike];
-
-      onPostUpdated(postClone);
-    } else {
-      const index = post.likes.indexOf(loggedUser.id);
-      if (index > -1) post.likes.splice(index, 1);
-
-      onPostUpdated(post);
-    }
-  }
-
   function createComment(newDescription: string) {
     if (!post) return;
 
     const newComment: PostComment = {
+      id: post.comments.length,
       userId: loggedUser.id,
-      likes: 0,
+      likes: [],
       date: new Date(),
       description: newDescription,
     };
@@ -95,10 +85,12 @@ export default function Post({ onPostSelected, post }: Props) {
 
   return (
     <div className="bg-my-light rounded-md relative">
-      <FontAwesomeIcon
-        className="h-5 w-5 absolute top-4 right-6 text-my-text-light hover:text-[white] cursor-pointer"
-        icon={faEllipsis}
-      />
+      <PostOptionsView
+        refToSet={optionsRef}
+        showOptionsView={showOptionsView}
+        setShowOptionsView={setShowOptionsView}
+        post={post}
+      ></PostOptionsView>
       <div className="flex">
         <Link href={`/users/${userData.id}`} className="">
           <img
@@ -134,24 +126,11 @@ export default function Post({ onPostSelected, post }: Props) {
         </button>
       </div>
       <div className="flex justify-between">
-        <div className="flex pl-6 pb-3 items-center gap-2 ">
-          <button onClick={() => onLikeAdd()}>
-            <FontAwesomeIcon
-              className={
-                (post.likes.includes(loggedUser.id)
-                  ? "text-[#e45858] hover:text-[white]"
-                  : "text-[white] hover:text-[#e45858]") +
-                " duration-300 transition-all hover:scale-[0.95] hover:rotate-12"
-              }
-              icon={faHeart}
-            ></FontAwesomeIcon>
-          </button>
-
+        <div className="flex pl-6 pb-3 items-center">
           <LikesAndUsers
             setShowLikesView={setShowLikesView}
             showLikesView={showLikesView}
-            refToSet={ref}
-            users={users}
+            refToSet={likesRef}
             post={post}
           ></LikesAndUsers>
         </div>
@@ -166,11 +145,11 @@ export default function Post({ onPostSelected, post }: Props) {
           ></FontAwesomeIcon>
         </button>
       </div>
-      <Comments
+      <PostComments
         showComments={showComments}
         post={post}
         users={users}
-      ></Comments>
+      ></PostComments>
       <UserComment
         loggedUser={loggedUser}
         createComment={createComment}
@@ -180,74 +159,10 @@ export default function Post({ onPostSelected, post }: Props) {
   );
 }
 
-function Comments({ showComments, post, users }: CommentsProps) {
-  const [loadLimit, setLoadLimit] = useState(3);
-  const loadOffset = 3;
-
-  return (
-    <div
-      className={
-        (showComments ? "flex flex-col bg-my-light gap-2 mb-4" : " h-0") +
-        " transition-all duration-300"
-      }
-    >
-      {post.comments.slice(0, loadLimit).map((comment, i) => {
-        const commentUserData = users[comment.userId];
-        return (
-          <div
-            key={"comment_key_" + i + "_on_post_" + comment.userId}
-            className={
-              (showComments
-                ? "bg-my-very-light p-2 rounded-md mx-4 h-full"
-                : "h-0") + " transition-all duration-300"
-            }
-          >
-            <div className={showComments ? "flex flex-col" : "hidden"}>
-              <div className="flex">
-                <Link href={`/users/${commentUserData.id}`} className="">
-                  <img
-                    className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-                    src={commentUserData.avatarUrl}
-                    alt={"avatar_user_" + commentUserData.id}
-                  />
-                </Link>
-
-                <div className=" mt-1 flex flex-col">
-                  <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
-                    {commentUserData.name} {commentUserData.surname}
-                  </p>
-                  <p className="text-my-text-light text-sm">
-                    {post.date.toDateString()}
-                  </p>
-                </div>
-              </div>
-
-              <div className=" ml-16 p-2 break-words">
-                {comment.description}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      <button
-        onClick={() => setLoadLimit(loadLimit + loadOffset)}
-        className={
-          loadLimit >= post.comments.length || !showComments
-            ? "hidden"
-            : " cursor-pointer text-my-accent ml-auto mr-10 mt-2 flex items-center gap-2 hover:text-[white] transition-all duration-300"
-        }
-      >
-        <p>show more</p>
-        <FontAwesomeIcon icon={faChevronDown}></FontAwesomeIcon>
-      </button>
-    </div>
-  );
-}
-
 function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
   const [showUserComment, setShowUserComment] = useState(false);
+  const maxCharCount = 300;
 
   function onDescriptionChange(e: FormEvent<HTMLTextAreaElement>) {
     const target = e.target as HTMLInputElement;
@@ -259,7 +174,7 @@ function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
       <div
         className={
           showUserComment
-            ? "bg-my-very-light p-2 relative rounded-md mx-4 transition-all duration-300 mb-4"
+            ? "bg-my-very-light p-2 relative rounded-xl mx-4 transition-all duration-300 mb-4"
             : "hidden"
         }
       >
@@ -272,15 +187,20 @@ function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
 
         <div className={"flex flex-col gap-4"}>
           <div className="flex">
-            <img
-              className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-              src={loggedUser.avatarUrl}
-              alt={"avatar_user_" + loggedUser.id}
-            />
+            <Link href={`/users/${loggedUser.id}`}>
+              <img
+                className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+                src={loggedUser.avatarUrl}
+                alt={"avatar_user_" + loggedUser.id}
+              />
+            </Link>
             <div className=" mt-1 flex flex-col">
-              <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
+              <Link
+                href={`/users/${loggedUser.id}`}
+                className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
+              >
                 {loggedUser.name} {loggedUser.surname}
-              </p>
+              </Link>
               <p className="text-my-text-light text-sm">
                 {post.date.toDateString()}
               </p>
@@ -294,21 +214,37 @@ function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
             placeholder="Write your comment here!"
           ></textarea>
 
-          <button
-            disabled={commentDescription === ""}
-            onClick={() => {
-              setShowUserComment(false);
-              createComment(commentDescription);
-            }}
-            className={
-              (commentDescription === ""
-                ? "pointer-events-none bg-my-light text-my-text-medium"
-                : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-light") +
-              " flex ml-auto mr-2 mb-2 px-4 py-1 rounded-md items-center"
-            }
-          >
-            <p>Submit</p>
-          </button>
+          <div className="flex ml-auto mr-2 mb-2">
+            <p
+              className={
+                (commentDescription.length > maxCharCount
+                  ? "text-[#e43e3e]"
+                  : "text-my-text-light") + "  pt-1 pr-4"
+              }
+            >
+              {commentDescription.length} / {maxCharCount}
+            </p>
+
+            <button
+              disabled={
+                commentDescription === "" ||
+                commentDescription.length > maxCharCount
+              }
+              onClick={() => {
+                setShowUserComment(false);
+                createComment(commentDescription);
+              }}
+              className={
+                (commentDescription === "" ||
+                commentDescription.length > maxCharCount
+                  ? "pointer-events-none bg-my-light text-my-text-medium"
+                  : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-light") +
+                " px-4 py-1 rounded-md items-center"
+              }
+            >
+              <p>Submit</p>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -318,7 +254,7 @@ function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
             setCommentDescription("");
             setShowUserComment(true);
           }}
-          className="bg-my-very-light p-2 w-full mx-4 rounded-md transition-all duration-300 mb-4 hover:bg-my-front-items hover:text-my-accent"
+          className="bg-my-very-light p-2 w-full mx-4 rounded-xl transition-all duration-300 mb-4 hover:bg-my-front-items hover:text-my-accent"
         >
           Add comment
         </button>
@@ -327,72 +263,189 @@ function UserComment({ loggedUser, post, createComment }: UserCommentProps) {
   );
 }
 
-function LikesAndUsers({
-  setShowLikesView,
-  refToSet,
-  showLikesView,
-  users,
+function PostOptionsView({
+  showOptionsView,
+  setShowOptionsView,
   post,
-}: LikesProps) {
-  const maxLikeItemCount = 3;
+  refToSet,
+}: PostOptionsProps) {
+  const { loggedUser, onUserUpdated } = useContext(UserContext);
+  const { onPostRemoved } = useContext(PostContext);
+  const [isLoggedUserPost, setIsLoggedUserPost] = useState(false);
+
+  const showOption = (option: PostOptionData): boolean => {
+    if (
+      loggedUser.hiddenPosts.includes(post.id) &&
+      option.type === PostOptionType.Hide
+    ) {
+      return false;
+    }
+
+    if (
+      !loggedUser.hiddenPosts.includes(post.id) &&
+      option.type === PostOptionType.RemoveFromHidden
+    ) {
+      return false;
+    }
+
+    if (
+      loggedUser.savedPosts.includes(post.id) &&
+      option.type === PostOptionType.Save
+    ) {
+      return false;
+    }
+
+    if (
+      !loggedUser.savedPosts.includes(post.id) &&
+      option.type === PostOptionType.RemoveFromSaved
+    ) {
+      return false;
+    }
+
+    if (
+      option.type === PostOptionType.RemoveFriend &&
+      !loggedUser.friends.includes(post.userId)
+    )
+      return false;
+
+    if (option.userOptionType === PostOptionUserType.IsDefaultOption)
+      return true;
+    else if (
+      option.userOptionType === PostOptionUserType.IsLoggedUserOption &&
+      isLoggedUserPost
+    )
+      return true;
+    else if (
+      option.userOptionType === PostOptionUserType.IsOtherUserOption &&
+      !isLoggedUserPost
+    )
+      return true;
+
+    return false;
+  };
+
+  function onPostOptionSelect(option: PostOptionData) {
+    if (option.type === PostOptionType.RemoveFriend) {
+      removeFriend(post.userId);
+    } else if (option.type === PostOptionType.RemovePost) {
+      onPostRemoved(post);
+    } else if (option.type === PostOptionType.Save) {
+      savePost();
+    } else if (option.type === PostOptionType.Hide) {
+      hidePost();
+    } else if (option.type === PostOptionType.RemoveFromSaved) {
+      removeSavedPost();
+    } else if (option.type === PostOptionType.RemoveFromHidden) {
+      removeHiddenPost();
+    }
+
+    setShowOptionsView(false);
+  }
+
+  function removeHiddenPost() {
+    const userClone = {
+      ...loggedUser,
+      hiddenPosts: loggedUser.hiddenPosts.filter((p) => p !== post.id),
+    };
+
+    onUserUpdated(userClone);
+  }
+
+  function removeSavedPost() {
+    const userClone = {
+      ...loggedUser,
+      savedPosts: loggedUser.savedPosts.filter((p) => p !== post.id),
+    };
+    onUserUpdated(userClone);
+  }
+
+  function savePost() {
+    const userClone = {
+      ...loggedUser,
+      savedPosts: [post.id, ...loggedUser.savedPosts],
+    };
+
+    onUserUpdated(userClone);
+  }
+
+  function hidePost() {
+    const userClone = {
+      ...loggedUser,
+      hiddenPosts: [post.id, ...loggedUser.hiddenPosts],
+    };
+
+    onUserUpdated(userClone);
+  }
+
+  function removeFriend(userID: number) {
+    if (!loggedUser.friends.includes(userID)) return;
+
+    const index = loggedUser.friends.indexOf(userID);
+    if (index > -1) {
+      const userClone = {
+        ...loggedUser,
+        friends: loggedUser.friends.filter((friend) => friend !== userID),
+      };
+      onUserUpdated(userClone);
+    }
+  }
+
+  useEffect(() => {
+    setIsLoggedUserPost(post.userId === loggedUser.id);
+  }, [loggedUser, post]);
 
   return (
-    <div ref={refToSet}>
-      <div className="flex relative ">
-        <button
-          onClick={() => setShowLikesView(!showLikesView)}
-          className="hover:text-my-accent duration-300 transition-all"
-        >
-          {post.likes.length}
-        </button>
+    <div ref={refToSet} className="absolute top-4 right-6 ">
+      <button onClick={() => setShowOptionsView(!showOptionsView)}>
+        <FontAwesomeIcon
+          className="h-5 w-5 text-my-text-light hover:text-[white] "
+          icon={faEllipsis}
+        />
+      </button>
 
-        <div
-          className={
-            (showLikesView ? "h-auto w-72 max-h-60 p-4" : "h-0 w-0") +
-            " absolute left-4 bottom-6 bg-my-very-light rounded-md flex overflow-y-auto transition-all duration-300"
-          }
+      <div
+        className={
+          (showOptionsView ? "h-auto w-72 max-h-60 p-4 z-10" : "h-0 w-0") +
+          " absolute right-4 top-6 bg-my-very-light rounded-md flex shadow-[#00000049] shadow-lg"
+        }
+      >
+        <ul
+          className={showOptionsView ? " w-full flex flex-col gap-2" : "hidden"}
         >
-          <div
-            className={
-              post.likes.length !== 0 || !showLikesView
-                ? "hidden"
-                : "basis-full shrink-0"
-            }
-          >
-            No likes yet
-          </div>
-
-          <ul
-            className={showLikesView ? " w-full flex flex-col gap-2" : "hidden"}
-          >
-            {post.likes.map((like, index) => {
-              const userData = users[like];
-              return (
-                <li key={index}>
-                  <button className="w-full h-full p-4 flex gap-3 items-center rounded-md bg-my-light hover:bg-my-front-items transition-colors duration-300 text-my-accent hover:text-my-text-light">
-                    <img
-                      className="w-8 h-8 rounded-full"
-                      src={userData.avatarUrl}
-                      alt={"avatar_user_" + userData.id}
-                    />
-                    <div className="flex flex-col">
-                      <p className="font-medium">
-                        {userData.name} {userData.surname}
-                      </p>
-                    </div>
-                  </button>
-                </li>
-              );
-            })}
-            <div
-              className={
-                post.likes.length <= maxLikeItemCount
-                  ? "hidden"
-                  : "min-h-1 w-full flex"
-              }
-            />
-          </ul>
-        </div>
+          {PostOptions.map((option, index) => {
+            return (
+              <li
+                key={"post_option_key_" + index}
+                className={showOption(option) ? "group" : "hidden"}
+              >
+                <div
+                  className={
+                    option.hasBreakLineTop
+                      ? "border-b border-my-text-medium w-full mb-2"
+                      : "hidden"
+                  }
+                ></div>
+                <button
+                  onClick={() => onPostOptionSelect(option)}
+                  className="group-hover:bg-my-light rounded-md p-2 flex w-full gap-4 items-center transition-color duration-300"
+                >
+                  <FontAwesomeIcon
+                    icon={option.icon}
+                    className="text-my-text-light h-5 w-5 group-hover:text-my-accent transition-color duration-300"
+                  ></FontAwesomeIcon>
+                  <p>{option.info}</p>
+                </button>
+                <div
+                  className={
+                    option.hasBreakLineBottom
+                      ? "border-b border-my-text-medium w-full mt-2"
+                      : "hidden"
+                  }
+                ></div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

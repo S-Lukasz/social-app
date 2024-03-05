@@ -3,21 +3,28 @@
 
 import { useContext } from "react";
 import { NavContext, PostContext, UserContext } from "./ContextWrapper";
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faS } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
+  const router = useRouter();
   const { loggedUser } = useContext(UserContext);
-  const { isNavOpen, setIsNavOpen } = useContext(NavContext);
+  const { isNavOpen, setIsNavOpen, setIsMultimediaView } =
+    useContext(NavContext);
   const { isPostSelected } = useContext(PostContext);
+
+  function onMainPageClick() {
+    setIsMultimediaView(false);
+    router.push("/");
+  }
 
   return (
     <header
       className={
         isPostSelected
           ? "hidden"
-          : "bg-my-front-items sticky top-0 z-10 flex items-center justify-between shadow-md w-full py-2"
+          : "bg-my-front-items sticky top-0 z-50 flex items-center justify-between shadow-md w-full py-2"
       }
     >
       <button
@@ -31,24 +38,15 @@ export default function Header() {
         />
       </button>
 
-      {/* <button
-        onClick={() => setIsNavOpen(!isNavOpen)}
-        className="bg-my-text-dark px-2 ml-4 py-1 text-center text-nowrap rounded-md hover:bg-my-accent transition-colors duration-300"
-      >
-        <div>show nav</div>
-      </button> */}
-      <Link
-        href={"/"}
+      <button
+        onClick={() => onMainPageClick()}
         className=" m-auto items-center justify-center flex text-center gap-2 "
       >
         <FontAwesomeIcon
           className="bg-my-accent rounded-md px-3 py-1 text-xl font-semibold hover:bg-my-very-light transition-colors duration-300"
           icon={faS}
         ></FontAwesomeIcon>
-        {/* <span className="bg-my-accent rounded-md px-4 py-1 font-semibold hover:bg-my-very-light transition-colors duration-300">
-          Social-App
-        </span> */}
-      </Link>
+      </button>
       <div className="absolute w-full h-full border-b border-my-text-dark pointer-events-none"></div>
     </header>
   );

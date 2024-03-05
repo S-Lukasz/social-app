@@ -22,6 +22,9 @@ import {
 import { PostContext, UserContext } from "./ContextWrapper";
 import { PostComment, User, UserPostItem } from "../consts";
 import useClickOutside from "../hooks/useClickOutside";
+import Link from "next/link";
+import PostComments from "./PostComments";
+import { log } from "console";
 
 interface Props {
   post: UserPostItem | undefined;
@@ -115,7 +118,7 @@ export default function PostSelected({
         </button>
 
         <img
-          className="rounded-md p-12 object-cover m-auto"
+          className="rounded-md p-12 object-cover mx-auto"
           src={post?.imageUrl}
           alt={"post_image"}
         />
@@ -139,15 +142,20 @@ export default function PostSelected({
             icon={faEllipsis}
           />
           <div className="flex">
-            <img
-              className="w-10 h-10 rounded-full mt-6 ml-6 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-              src={userData.avatarUrl}
-              alt={"avatar_user_" + userData.id}
-            />
+            <Link href={`/users/${userData.id}`} className="">
+              <img
+                className="w-10 h-10 rounded-full mt-6 ml-6 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+                src={userData.avatarUrl}
+                alt={"avatar_user_" + userData.id}
+              />
+            </Link>
             <div className=" mt-5 flex flex-col">
-              <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
+              <Link
+                href={`/users/${userData.id}`}
+                className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
+              >
                 {userData.name} {userData.surname}
-              </p>
+              </Link>
               <p className="text-my-text-light text-sm">
                 {post?.date.toDateString()}
               </p>
@@ -236,7 +244,10 @@ function LikesAndUsers({
               const userData = users[like];
               return (
                 <li key={index}>
-                  <button className="w-full h-full p-4 flex gap-3 items-center rounded-md bg-my-light hover:bg-my-front-items transition-colors duration-300 text-my-accent hover:text-my-text-light">
+                  <Link
+                    href={`/users/${userData.id}`}
+                    className="w-full h-full p-4 flex gap-3 items-center rounded-md bg-my-light hover:bg-my-front-items transition-colors duration-300 text-my-accent hover:text-my-text-light"
+                  >
                     <img
                       className="w-8 h-8 rounded-full"
                       src={userData.avatarUrl}
@@ -247,7 +258,7 @@ function LikesAndUsers({
                         {userData.name} {userData.surname}
                       </p>
                     </div>
-                  </button>
+                  </Link>
                 </li>
               );
             })}
@@ -286,15 +297,20 @@ function Comments({ commentsRef, post, users }: CommentsProps) {
             >
               <div className={"flex flex-col"}>
                 <div className="flex">
-                  <img
-                    className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-                    src={commentUserData.avatarUrl}
-                    alt={"avatar_user_" + commentUserData.id}
-                  />
+                  <Link href={`/users/${commentUserData.id}`}>
+                    <img
+                      className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+                      src={commentUserData.avatarUrl}
+                      alt={"avatar_user_" + commentUserData.id}
+                    />
+                  </Link>
                   <div className=" mt-1 flex flex-col">
-                    <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
+                    <Link
+                      href={`/users/${commentUserData.id}`}
+                      className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
+                    >
                       {commentUserData.name} {commentUserData.surname}
-                    </p>
+                    </Link>
                     <p className="text-my-text-light text-sm">
                       {post.date.toDateString()}
                     </p>
@@ -327,6 +343,7 @@ function Comments({ commentsRef, post, users }: CommentsProps) {
 
 function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
+  const maxCharCount = 300;
 
   useEffect(() => {
     if (post) {
@@ -338,8 +355,9 @@ function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
     if (!post) return;
 
     const newComment: PostComment = {
+      id: post.comments.length,
       userId: loggedUser.id,
-      likes: 0,
+      likes: [],
       date: new Date(),
       description: newDescription,
     };
@@ -362,15 +380,20 @@ function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
       >
         <div className={"flex flex-col gap-4"}>
           <div className="flex">
-            <img
-              className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-              src={loggedUser.avatarUrl}
-              alt={"avatar_user_" + loggedUser.id}
-            />
+            <Link href={`/users/${loggedUser.id}`}>
+              <img
+                className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+                src={loggedUser.avatarUrl}
+                alt={"avatar_user_" + loggedUser.id}
+              />
+            </Link>
             <div className=" mt-1 flex flex-col">
-              <p className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium">
+              <Link
+                href={`/users/${loggedUser.id}`}
+                className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
+              >
                 {loggedUser.name} {loggedUser.surname}
-              </p>
+              </Link>
               <p className="text-my-text-light text-sm">
                 {post.date.toDateString()}
               </p>
@@ -384,23 +407,39 @@ function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
             placeholder="Write your comment here!"
           ></textarea>
 
-          <button
-            disabled={commentDescription === ""}
-            onClick={() => {
-              {
-                setCommentDescription("");
-                createComment(commentDescription);
+          <div className="flex ml-auto mr-2 ">
+            <p
+              className={
+                (commentDescription.length > maxCharCount
+                  ? "text-[#e43e3e]"
+                  : "text-my-text-light") + "  pt-1 pr-4"
               }
-            }}
-            className={
-              (commentDescription === ""
-                ? "pointer-events-none bg-my-light text-my-text-medium"
-                : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-light") +
-              " flex ml-auto mr-2 mb-2 px-4 py-1 rounded-md items-center"
-            }
-          >
-            <p>Submit</p>
-          </button>
+            >
+              {commentDescription.length} / {maxCharCount}
+            </p>
+
+            <button
+              disabled={
+                commentDescription === "" ||
+                commentDescription.length > maxCharCount
+              }
+              onClick={() => {
+                {
+                  setCommentDescription("");
+                  createComment(commentDescription);
+                }
+              }}
+              className={
+                (commentDescription === "" ||
+                commentDescription.length > maxCharCount
+                  ? "pointer-events-none bg-my-light text-my-text-medium"
+                  : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-light") +
+                " mb-2 px-4 py-1 rounded-md items-center"
+              }
+            >
+              <p>Submit</p>
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -19,7 +19,9 @@ export interface IUserContext {
 
 export interface INavContext {
   isNavOpen: boolean;
+  isMultimediaView: boolean;
   setIsNavOpen: Dispatch<SetStateAction<boolean>>;
+  setIsMultimediaView: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface IPostContext {
@@ -28,6 +30,7 @@ export interface IPostContext {
   posts: UserPostItem[];
   onPostUpdated: (updatedPost: UserPostItem) => void;
   onNewPostAdded: (updatedPost: UserPostItem) => void;
+  onPostRemoved: (updatedPost: UserPostItem) => void;
   setIsNewPostActive: Dispatch<SetStateAction<boolean>>;
   setIsPostSelected: Dispatch<SetStateAction<boolean>>;
   setPosts: Dispatch<SetStateAction<UserPostItem[]>>;
@@ -43,7 +46,9 @@ export const UserContext = createContext<IUserContext>({
 
 export const NavContext = createContext<INavContext>({
   isNavOpen: false,
+  isMultimediaView: false,
   setIsNavOpen: () => {},
+  setIsMultimediaView: () => {},
 });
 
 export const PostContext = createContext<IPostContext>({
@@ -52,6 +57,7 @@ export const PostContext = createContext<IPostContext>({
   posts: [],
   onPostUpdated: () => {},
   onNewPostAdded: () => {},
+  onPostRemoved: () => {},
   setIsNewPostActive: () => {},
   setIsPostSelected: () => {},
   setPosts: () => {},
@@ -63,6 +69,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [isMultimediaView, setIsMultimediaView] = useState(false);
   const [isNewPostActive, setIsNewPostActive] = useState(false);
   const [isPostSelected, setIsPostSelected] = useState(false);
   const [loggedUser, setloggedUser] = useState(CurrentUser);
@@ -72,6 +79,10 @@ export default function RootLayout({
   function onNewPostAdded(newPost: UserPostItem) {
     const postsUpdated = [newPost, ...posts];
     setPosts(postsUpdated);
+  }
+
+  function onPostRemoved(removedPost: UserPostItem) {
+    setPosts(posts.filter((post) => post.id !== removedPost.id));
   }
 
   function onPostUpdated(updatedPost: UserPostItem) {
@@ -108,6 +119,7 @@ export default function RootLayout({
           posts,
           onPostUpdated,
           onNewPostAdded,
+          onPostRemoved,
           setIsNewPostActive,
           setIsPostSelected,
           setPosts,
@@ -116,7 +128,9 @@ export default function RootLayout({
         <NavContext.Provider
           value={{
             isNavOpen,
+            isMultimediaView,
             setIsNavOpen,
+            setIsMultimediaView,
           }}
         >
           {children}

@@ -143,7 +143,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
           <div className="flex flex-col rounded-md bg-my-light  w-1/3">
             <div className="flex flex-col gap-2">
               <div className="text-center mt-4 font-semibold text-lg  mx-4 rounded-md">
-                User data
+                About
               </div>
               {UserProfileData.map((data, i) => (
                 <div

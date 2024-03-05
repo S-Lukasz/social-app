@@ -22,7 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ContextWrapper>
-          <div className="flex min-h-screen flex-col bg-my-dark">
+          <div className="flex min-h-screen flex-col dark:bg-my-dark">
             <Header />
             <Nav />
             {children}

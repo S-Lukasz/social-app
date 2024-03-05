@@ -10,6 +10,8 @@ const config: Config = {
     colors: {
       transparent: "transparent",
       current: "currentColor",
+      "my-theme-light-bg": "#f0f2f5",
+      "my-theme-light-front": "#e4e6e8",
       "my-very-dark": "#121216",
       "my-dark": "#16171b",
       "my-front-items": "#222327",

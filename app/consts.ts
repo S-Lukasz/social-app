@@ -1,19 +1,29 @@
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
-  faBars,
+  faBookmark,
   faCake,
   faCalendar,
+  faClose,
+  faEdit,
+  faEye,
+  faEyeSlash,
   faGear,
   faGlobe,
   faHouse,
+  faPhotoFilm,
+  faRightFromBracket,
   faSuitcase,
+  faTrash,
   faUser,
+  faUserMinus,
 } from "@fortawesome/free-solid-svg-icons";
 
 export enum NavItemType {
   UserProfile,
   UserSettings,
+  Multimedia,
   Other,
+  LogOut,
 }
 
 export enum UserProfileInfoType {
@@ -22,6 +32,26 @@ export enum UserProfileInfoType {
   Job,
   Place,
   Website,
+}
+
+export enum PostOptionType {
+  RemovePost,
+  Save,
+  Hide,
+  RemoveFriend,
+  RemoveFromSaved,
+  RemoveFromHidden,
+}
+
+export enum PostOptionUserType {
+  IsLoggedUserOption,
+  IsDefaultOption,
+  IsOtherUserOption,
+}
+
+export enum CommentOptionType {
+  Remove,
+  Edit,
 }
 
 export interface User {
@@ -33,6 +63,8 @@ export interface User {
   description: string;
   avatarUrl: string;
   friends: number[];
+  savedPosts: number[];
+  hiddenPosts: number[];
 }
 
 export interface UserNavItem {
@@ -54,8 +86,9 @@ export interface UserPostItem {
 }
 
 export interface PostComment {
+  id: number;
   userId: number;
-  likes: number;
+  likes: number[];
   date: Date;
   imageUrl?: string;
   description: string;
@@ -65,6 +98,22 @@ export interface UserProfileData {
   info?: string;
   type: UserProfileInfoType;
   icon: IconDefinition;
+}
+
+export interface PostOptionData {
+  info?: string;
+  type: PostOptionType;
+  icon: IconDefinition;
+  userOptionType: PostOptionUserType;
+  hasBreakLineTop: boolean;
+  hasBreakLineBottom: boolean;
+}
+
+export interface CommentOptionData {
+  info?: string;
+  icon: IconDefinition;
+  isUserOption: boolean;
+  type: CommentOptionType;
 }
 
 export const UserProfileData: UserProfileData[] = [
@@ -95,16 +144,83 @@ export const UserProfileData: UserProfileData[] = [
   },
 ];
 
+export const CommentOptions: CommentOptionData[] = [
+  {
+    info: "Remove comment",
+    icon: faTrash,
+    isUserOption: true,
+    type: CommentOptionType.Remove,
+  },
+  {
+    info: "Edit comment",
+    icon: faEdit,
+    isUserOption: true,
+    type: CommentOptionType.Edit,
+  },
+];
+
+export const PostOptions: PostOptionData[] = [
+  {
+    info: "Remove Post",
+    type: PostOptionType.RemovePost,
+    icon: faTrash,
+    userOptionType: PostOptionUserType.IsLoggedUserOption,
+    hasBreakLineTop: false,
+    hasBreakLineBottom: true,
+  },
+  {
+    info: "Save Post",
+    type: PostOptionType.Save,
+    icon: faBookmark,
+    userOptionType: PostOptionUserType.IsDefaultOption,
+    hasBreakLineTop: false,
+    hasBreakLineBottom: false,
+  },
+  {
+    info: "Remove from saved",
+    type: PostOptionType.RemoveFromSaved,
+    icon: faClose,
+    userOptionType: PostOptionUserType.IsDefaultOption,
+    hasBreakLineTop: false,
+    hasBreakLineBottom: false,
+  },
+  {
+    info: "Hide Post",
+    type: PostOptionType.Hide,
+    icon: faEyeSlash,
+    userOptionType: PostOptionUserType.IsDefaultOption,
+    hasBreakLineTop: false,
+    hasBreakLineBottom: false,
+  },
+  {
+    info: "Remove from hidden",
+    type: PostOptionType.RemoveFromHidden,
+    icon: faEye,
+    userOptionType: PostOptionUserType.IsDefaultOption,
+    hasBreakLineTop: false,
+    hasBreakLineBottom: false,
+  },
+  {
+    info: "Remove Friend",
+    type: PostOptionType.RemoveFriend,
+    icon: faUserMinus,
+    userOptionType: PostOptionUserType.IsOtherUserOption,
+    hasBreakLineTop: true,
+    hasBreakLineBottom: false,
+  },
+];
+
 export const CurrentUser: User = {
   id: 0,
   age: 16,
   isActive: true,
   name: "Grzegorz",
   surname: "Wiejniecki",
-  description:
-    "Description of the user, can be a little bit longer than name..",
+  description: "Make today so awesome that yesterday becomes jealous.",
   avatarUrl: "/avatars/avatar_temp.png",
   friends: [1, 3],
+  savedPosts: [],
+  hiddenPosts: [],
 };
 
 export const USERS: User[] = [
@@ -119,6 +235,8 @@ export const USERS: User[] = [
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
     friends: [0, 1],
+    savedPosts: [],
+    hiddenPosts: [],
   },
   {
     id: 2,
@@ -130,9 +248,24 @@ export const USERS: User[] = [
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
     friends: [1, 3, 2],
+    savedPosts: [],
+    hiddenPosts: [],
   },
   {
     id: 3,
+    age: 17,
+    isActive: true,
+    name: "Paulina",
+    surname: "Grzebień",
+    description:
+      "Description of the user, can be a little bit longer than name..",
+    avatarUrl: "/avatars/avatar_temp.png",
+    friends: [0, 2],
+    savedPosts: [],
+    hiddenPosts: [],
+  },
+  {
+    id: 4,
     age: 22,
     isActive: false,
     name: "Benedykt",
@@ -141,9 +274,11 @@ export const USERS: User[] = [
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
     friends: [],
+    savedPosts: [],
+    hiddenPosts: [],
   },
   {
-    id: 4,
+    id: 5,
     age: 38,
     isActive: false,
     name: "Wojciech",
@@ -152,6 +287,8 @@ export const USERS: User[] = [
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
     friends: [2, 3, 4],
+    savedPosts: [],
+    hiddenPosts: [],
   },
 ];
 
@@ -165,38 +302,25 @@ export const USER_NAV_ITEMS: UserNavItem[] = [
   },
   {
     name: "Settings",
-    description: "User nav item description, so can be longer",
+    description: "Setup your privacy, manage preferences and more.",
     hasBreakLine: true,
     type: NavItemType.UserSettings,
     icon: faGear,
   },
   {
-    name: "User item 3",
-    description: "User nav item description, so can be longer",
+    name: "Multimedia",
+    description: "Manage your saved posts and other multimedia features.",
     hasBreakLine: false,
-    type: NavItemType.Other,
-    icon: faBars,
+    type: NavItemType.Multimedia,
+    icon: faPhotoFilm,
   },
   {
-    name: "User item 4",
-    description: "User nav item description, so can be longer",
-    hasBreakLine: false,
-    type: NavItemType.Other,
-    icon: faBars,
-  },
-  {
-    name: "User item 3",
-    description: "User nav item description, so can be longer",
+    name: "Log Out",
+    description:
+      "Ends the access to your profile on a website. Come back soon!",
     hasBreakLine: true,
-    type: NavItemType.Other,
-    icon: faBars,
-  },
-  {
-    name: "User item 4",
-    description: "User nav item description, so can be longer",
-    hasBreakLine: false,
-    type: NavItemType.Other,
-    icon: faBars,
+    type: NavItemType.LogOut,
+    icon: faRightFromBracket,
   },
 ];
 
@@ -207,28 +331,21 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     likes: [1, 2, 0, 3],
     date: new Date(),
     imageUrl: "/posts/post_image_temp_1.png",
-    description:
-      "User post item description 1, so can be long, lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem lorem ipsum lorem ipsum lorem ipsum lorem ipsum ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum ",
+    description: "Great view and memories!",
     comments: [
       {
+        id: 0,
         userId: 1,
-        likes: 20,
+        likes: [0, 1, 2],
         date: new Date(),
-        description:
-          "comment description 1 lorem ipsum comment description 1 lorem ipsum comment description 1 lorem ipsumcomment description 1 lorem ipsum comment description 1 lorem ipsum",
+        description: "Really nice 😍!",
       },
       {
+        id: 1,
         userId: 2,
-        likes: 4,
+        likes: [1, 2],
         date: new Date(),
-        description:
-          "comment description 2 lorem ipsum comment description 2 lorem ipsumcomment description 2 lorem ipsum comment description 2 lorem ipsum",
-      },
-      {
-        userId: 1,
-        likes: 114,
-        date: new Date(),
-        description: "comment description 3 lorem ipsum",
+        description: "Next time we will go there together 😜",
       },
     ],
   },
@@ -237,30 +354,35 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     userId: 0,
     likes: [1],
     date: new Date(),
-    description:
-      "User post item description 2, so can be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum lorem ipsum lorem ipsum ipsum lorem ipsum",
+    description: "User post item description 2.",
     comments: [
       {
+        id: 0,
         userId: 1,
-        likes: 20,
+
+        likes: [1, 2],
         date: new Date(),
         description: "comment description 1 lorem ipsum",
       },
       {
+        id: 1,
         userId: 2,
-        likes: 4,
+
+        likes: [1],
         date: new Date(),
         description: "comment description 2 lorem ipsum",
       },
       {
+        id: 2,
         userId: 1,
-        likes: 114,
+        likes: [],
         date: new Date(),
         description: "comment description 3 lorem ipsum",
       },
       {
+        id: 3,
         userId: 3,
-        likes: 2,
+        likes: [0, 2],
         date: new Date(),
         description: "comment description 4 lorem ipsum",
       },
@@ -269,16 +391,17 @@ export const USER_POST_ITEMS: UserPostItem[] = [
   {
     id: 2,
     userId: 2,
-    likes: [1, 0, 3],
+    likes: [1, 0, 3, 2],
     date: new Date(),
     imageUrl: "/posts/post_image_temp_2.png",
-    description: "User post item description 3",
+    description: "Yesterday I took some Yoga classes, it was really fun!",
     comments: [
       {
+        id: 0,
         userId: 1,
-        likes: 20,
+        likes: [1, 2],
         date: new Date(),
-        description: "comment description 1 lorem ipsum",
+        description: "Wow! Really nice 😄.",
       },
     ],
   },
@@ -287,32 +410,59 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     userId: 1,
     likes: [1, 2, 3],
     date: new Date(),
-    description:
-      "User post item description 4   be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum l  be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum l be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum l  be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum l  be long, lorem ipsum lorem ipsum lorem ipsum m lorem lorem ipsum lorem ipsum l",
+    description: "User post item description 4.",
     comments: [
       {
+        id: 0,
         userId: 1,
-        likes: 20,
+        likes: [1, 2],
         date: new Date(),
-        description: "comment description 1 lorem ipsum",
+        description: "comment description 1",
       },
       {
+        id: 1,
         userId: 2,
-        likes: 4,
+        likes: [1, 2],
         date: new Date(),
-        description: "comment description 2 lorem ipsum",
+        description: "comment description 2",
       },
       {
+        id: 2,
         userId: 1,
-        likes: 114,
+        likes: [1, 2],
         date: new Date(),
-        description: "comment description 3 lorem ipsum",
+        description: "comment description 3",
       },
       {
+        id: 3,
         userId: 0,
-        likes: 3,
+        likes: [1, 2, 3],
         date: new Date(),
-        description: "comment description 4 lorem ipsum",
+        description: "comment description 4",
+      },
+    ],
+  },
+  {
+    id: 4,
+    userId: 4,
+    likes: [1, 2, 3],
+    date: new Date(),
+    description: "Last year was really nice!",
+    imageUrl: "/posts/post_image_temp_3.png",
+    comments: [
+      {
+        id: 0,
+        userId: 1,
+        likes: [1, 2],
+        date: new Date(),
+        description: "Yeah 😊",
+      },
+      {
+        id: 1,
+        userId: 2,
+        likes: [1, 2],
+        date: new Date(),
+        description: "Wow! Really nice 😄.",
       },
     ],
   },
