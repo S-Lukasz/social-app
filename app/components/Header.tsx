@@ -68,7 +68,7 @@ export default function Header() {
             value={usersSearch}
             onSelect={() => onInputSelect()}
             onInput={(e) => onSearchChanges(e)}
-            className="bg-my-very-light rounded-md w-full min-w-44 pl-10 py-1"
+            className="bg-my-very-light rounded-md max-w-56 pl-10 py-1"
             placeholder="search for users.."
             type="text"
           />
