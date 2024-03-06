@@ -8,6 +8,7 @@ import {
   User,
   UserPostItem,
 } from "../consts";
+import useDisableScroll from "../hooks/useDisableScroll";
 
 export interface IUserContext {
   users: User[];
@@ -19,9 +20,14 @@ export interface IUserContext {
 
 export interface INavContext {
   isNavOpen: boolean;
+  usersSearch: string;
+  isUsersListOpen: boolean;
   isMultimediaView: boolean;
   setIsNavOpen: Dispatch<SetStateAction<boolean>>;
+  setUsersSearch: Dispatch<SetStateAction<string>>;
+  setIsUsersListOpen: Dispatch<SetStateAction<boolean>>;
   setIsMultimediaView: Dispatch<SetStateAction<boolean>>;
+  setScrollBlocked: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface IPostContext {
@@ -46,9 +52,14 @@ export const UserContext = createContext<IUserContext>({
 
 export const NavContext = createContext<INavContext>({
   isNavOpen: false,
+  usersSearch: "",
+  isUsersListOpen: false,
   isMultimediaView: false,
+  setUsersSearch: () => {},
   setIsNavOpen: () => {},
   setIsMultimediaView: () => {},
+  setIsUsersListOpen: () => {},
+  setScrollBlocked: () => {},
 });
 
 export const PostContext = createContext<IPostContext>({
@@ -70,9 +81,14 @@ export default function RootLayout({
 }) {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isMultimediaView, setIsMultimediaView] = useState(false);
+  const [isUsersListOpen, setIsUsersListOpen] = useState(false);
   const [isNewPostActive, setIsNewPostActive] = useState(false);
   const [isPostSelected, setIsPostSelected] = useState(false);
   const [loggedUser, setloggedUser] = useState(CurrentUser);
+  const [usersSearch, setUsersSearch] = useState("");
+
+  const { setScrollBlocked } = useDisableScroll();
+
   const [users, setUsers] = useState<User[]>(USERS);
   const [posts, setPosts] = useState<UserPostItem[]>(USER_POST_ITEMS);
 
@@ -128,9 +144,14 @@ export default function RootLayout({
         <NavContext.Provider
           value={{
             isNavOpen,
+            isUsersListOpen,
             isMultimediaView,
+            usersSearch,
             setIsNavOpen,
+            setUsersSearch,
+            setIsUsersListOpen,
             setIsMultimediaView,
+            setScrollBlocked,
           }}
         >
           {children}

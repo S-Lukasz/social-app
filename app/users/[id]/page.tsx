@@ -87,13 +87,6 @@ export default function UserPage({ params }: { params: { id: number } }) {
   }, [userData, posts]);
 
   useEffect(() => {
-    console.log(
-      "(friends: ",
-      loggedUser.friends,
-      "includes: ",
-      loggedUser.friends.includes(userData.id)
-    );
-
     if (userData.id === loggedUser.id) {
       setUserActionButtonText("Edit profile");
     } else if (loggedUser.friends.includes(userData.id)) {
@@ -113,34 +106,34 @@ export default function UserPage({ params }: { params: { id: number } }) {
         post={postSelected}
       ></PostSelected>
 
-      <div className="flex flex-col pb-4 mx-auto w-2/3">
-        <div className="flex rounded-md bg-my-light p-4 m-4 h-full">
+      <div className="flex flex-col pb-4 mx-auto xl:w-2/3 w-11/12">
+        <div className="flex rounded-md bg-my-light xl:p-4 p-2 m-4 ">
           <img
-            className="w-32 h-32 rounded-full mt-2 ml-2 mr-4 cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+            className="xl:w-32 xl:h-32 w-24 h-24 rounded-full mt-2 ml-2 mr-4 cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
             src={userData.avatarUrl}
             alt={"avatar_user_" + userData.id}
           />
-          <div className="flex w-full justify-between">
+          <div className="flex xl:flex-row flex-col  w-full justify-between">
             <div className="flex flex-col m-4">
               <span className="font-semibold text-2xl">
                 {userData.name} {userData.surname}
               </span>
-              <span className="font-medium text-lg text-my-text-light">
+              <span className="font-medium xl:text-lg text-my-text-light ">
                 {userData.description}
               </span>
             </div>
 
             <button
               onClick={() => onUserActionButton()}
-              className="px-6 h-8 font-medium text-lg text-center rounded-md bg-my-accent hover:bg-my-very-light duration-300 transition-colors"
+              className="m-2 xl:m-0 px-6 h-8 font-medium text-lg text-center rounded-md bg-my-accent hover:bg-my-very-light duration-300 transition-colors"
             >
               {userActionButtonText}
             </button>
           </div>
         </div>
 
-        <div className="flex px-4  gap-4">
-          <div className="flex flex-col rounded-md bg-my-light  w-1/3">
+        <div className="flex px-4 xl:flex-row flex-col  gap-4">
+          <div className="flex flex-col rounded-md bg-my-light  xl:w-1/3 w-full">
             <div className="flex flex-col gap-2">
               <div className="text-center mt-4 font-semibold text-lg  mx-4 rounded-md">
                 About
@@ -167,7 +160,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                 ref={commentsScrollListRef}
                 className={
                   (scrollHeight >= maxScrollHeight ? "overflow-y-scroll" : "") +
-                  " grid grid-cols-3 mx-3 pb-10 min-h-[32rem] max-h-[32rem] relative"
+                  " grid grid-cols-3 xl:mx-3 mx-2 xl:pb-10 pb-4 xl:min-h-[32rem] max-h-[32rem] relative"
                 }
               >
                 {userData.friends.slice(0, loadLimit).map((friendId) => {
@@ -179,7 +172,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
                       className="items-center text-center group"
                     >
                       <img
-                        className="w-28 h-28 rounded-md mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-200 transition-all scale:110 hover:scale-100"
+                        className="xl:w-28 xl:h-28 w-24 h-24 rounded-md mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-200 transition-all scale:110 hover:scale-100"
                         src={friendData.avatarUrl}
                         alt={"avatar_user_" + friendData.id}
                       />
@@ -204,7 +197,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
               </div>
             </div>
           </div>
-          <div className="flex flex-col w-2/3 gap-4">
+          <div className="flex flex-col xl:w-2/3 w-full gap-4">
             <div className="bg-my-light rounded-md w-full text-center text-xl font-medium py-2">
               Posts
             </div>

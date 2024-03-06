@@ -217,7 +217,7 @@ export const CurrentUser: User = {
   surname: "Wiejniecki",
   description: "Make today so awesome that yesterday becomes jealous.",
   avatarUrl: "/avatars/avatar_temp.png",
-  friends: [1, 3],
+  friends: [1, 3, 2],
   savedPosts: [],
   hiddenPosts: [],
 };
@@ -246,7 +246,7 @@ export const USERS: User[] = [
     description:
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
-    friends: [1, 3, 2],
+    friends: [1, 0],
     savedPosts: [],
     hiddenPosts: [],
   },
@@ -272,7 +272,7 @@ export const USERS: User[] = [
     description:
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
-    friends: [],
+    friends: [2, 3, 4, 1, 0],
     savedPosts: [],
     hiddenPosts: [],
   },
@@ -285,7 +285,7 @@ export const USERS: User[] = [
     description:
       "Description of the user, can be a little bit longer than name..",
     avatarUrl: "/avatars/avatar_temp.png",
-    friends: [2, 3, 4],
+    friends: [],
     savedPosts: [],
     hiddenPosts: [],
   },

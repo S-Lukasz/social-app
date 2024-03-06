@@ -12,7 +12,6 @@ import {
 import {
   Dispatch,
   FormEvent,
-  RefObject,
   SetStateAction,
   useContext,
   useEffect,
@@ -21,6 +20,7 @@ import {
 } from "react";
 import { PostContext, UserContext } from "./ContextWrapper";
 import { PostComment, User, UserPostItem } from "../consts";
+import PostOptionsView from "./PostOptionsView";
 import useClickOutside from "../hooks/useClickOutside";
 import Link from "next/link";
 import PostComments from "./PostComments";
@@ -29,12 +29,6 @@ interface Props {
   post: UserPostItem | undefined;
   onPostUpdated: (updatedPost: UserPostItem) => void;
   setScrollBlocked: Dispatch<SetStateAction<boolean>>;
-}
-
-interface CommentsProps {
-  commentsRef: RefObject<HTMLDivElement>;
-  post: UserPostItem;
-  users: User[];
 }
 
 interface UserCommentProps {
@@ -106,10 +100,10 @@ export default function PostSelected({
     <div
       className={
         (isPostSelected ? "w-full h-full z-30 bg-my-front-items" : "hidden") +
-        " fixed transition-all duration-300 flex justify-between"
+        " fixed transition-all duration-300 flex justify-between xl:flex-row flex-col xl:overflow-hidden overflow-y-scroll"
       }
     >
-      <div className="flex w-3/4 relative bg-my-very-dark justify-between">
+      <div className="flex xl:w-3/4 relative bg-my-very-dark justify-between">
         <button
           onClick={() => {
             setScrollBlocked(false);
@@ -130,23 +124,19 @@ export default function PostSelected({
         />
       </div>
 
-      <div className="flex w-1/4 bg-my-front-items relative ">
+      <div className="flex xl:w-1/4 bg-my-front-items relative ">
         <UserComment
           loggedUser={loggedUser}
           post={post}
           onPostUpdated={onPostUpdated}
         ></UserComment>
-
         <div
           className={
-            (scrollHeight >= maxScrollHeight ? "overflow-y-scroll" : "") +
-            " bg-my-light rounded-md relative w-full  mb-64"
+            (scrollHeight >= maxScrollHeight ? "xl:overflow-y-scroll" : "") +
+            " bg-my-light relative w-full mb-64"
           }
         >
-          <FontAwesomeIcon
-            className="h-5 w-5 absolute top-4 right-6 text-my-text-light hover:text-[white] cursor-pointer"
-            icon={faEllipsis}
-          />
+          <PostOptionsView post={post}></PostOptionsView>
           <div className="flex">
             <Link href={`/users/${userData.id}`} className="">
               <img
@@ -283,71 +273,6 @@ function LikesAndUsers({
   );
 }
 
-// function Comments({ commentsRef, post, users }: CommentsProps) {
-//   const [loadLimit, setLoadLimit] = useState(3);
-//   const loadOffset = 3;
-
-//   return (
-//     <div className="flex flex-col relative items-center">
-//       <div
-//         ref={commentsRef}
-//         className="flex flex-col bg-my-light gap-2 mb-4 mt-2 w-full transition-all duration-300"
-//       >
-//         {post.comments.slice(0, loadLimit).map((comment, i) => {
-//           const commentUserData = users[comment.userId];
-//           return (
-//             <div
-//               key={"comment_key_" + i + "_on_post_" + comment.userId}
-//               className={
-//                 "bg-my-very-light p-2 rounded-md mx-4 h-full transition-all duration-300"
-//               }
-//             >
-//               <div className={"flex flex-col"}>
-//                 <div className="flex">
-//                   <Link href={`/users/${commentUserData.id}`}>
-//                     <img
-//                       className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-//                       src={commentUserData.avatarUrl}
-//                       alt={"avatar_user_" + commentUserData.id}
-//                     />
-//                   </Link>
-//                   <div className=" mt-1 flex flex-col">
-//                     <Link
-//                       href={`/users/${commentUserData.id}`}
-//                       className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
-//                     >
-//                       {commentUserData.name} {commentUserData.surname}
-//                     </Link>
-//                     <p className="text-my-text-light text-sm">
-//                       {post.date.toDateString()}
-//                     </p>
-//                   </div>
-//                 </div>
-
-//                 <div className=" ml-16 p-2 break-words">
-//                   {comment.description}
-//                 </div>
-//               </div>
-//             </div>
-//           );
-//         })}
-//         <button
-//           onClick={() => setLoadLimit(loadLimit + loadOffset)}
-//           className={
-//             loadLimit >= post.comments.length
-//               ? "hidden"
-//               : " cursor-pointer text-my-accent ml-auto mr-10 mb-2 mt-1 flex items-center gap-2 hover:text-[white] transition-all duration-300"
-//           }
-//         >
-//           <p>show more</p>
-//           <FontAwesomeIcon icon={faChevronDown}></FontAwesomeIcon>
-//         </button>
-//         <div className="min-h-[1px]"></div>
-//       </div>
-//     </div>
-//   );
-// }
-
 function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");
   const maxCharCount = 300;
@@ -382,7 +307,7 @@ function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
     <div>
       <div
         className={
-          "bg-my-very-light z-40 p-2 absolute bottom-0 w-11/12 rounded-md mx-4 transition-all duration-300 mb-4"
+          "bg-my-very-light z-10 p-2 absolute bottom-0 w-11/12 rounded-md xl:mx-4 ml-5 transition-all duration-300 xl:mb-4 mb-3"
         }
       >
         <div className={"flex flex-col gap-4"}>

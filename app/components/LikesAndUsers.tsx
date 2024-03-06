@@ -17,6 +17,7 @@ import { faHeart } from "@fortawesome/free-solid-svg-icons";
 interface LikesProps {
   setShowLikesView: Dispatch<SetStateAction<boolean>>;
   showLikesView: boolean;
+  isDropDownLeft: boolean;
   post: UserPostItem;
   comment?: PostComment;
   refToSet: any;
@@ -27,6 +28,7 @@ export default function LikesAndUsers({
   refToSet,
   showLikesView,
   post,
+  isDropDownLeft,
   comment,
 }: LikesProps) {
   const { users, loggedUser } = useContext(UserContext);
@@ -112,7 +114,8 @@ export default function LikesAndUsers({
         <div
           className={
             (showLikesView ? "h-auto w-72 max-h-60 p-4" : "h-0 w-0") +
-            " absolute left-4 bottom-6 bg-my-very-light rounded-md flex overflow-y-auto transition-all duration-300 shadow-[#00000048] shadow-md"
+            (isDropDownLeft ? " right-4 bottom-6" : " left-4 bottom-6") +
+            " absolute bg-my-very-light rounded-md flex overflow-y-auto transition-all duration-300 shadow-[#00000048] shadow-md"
           }
         >
           <div

@@ -1,22 +1,42 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useContext } from "react";
+import { FormEvent, useContext } from "react";
 import { NavContext, PostContext, UserContext } from "./ContextWrapper";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faS } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faS } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
 export default function Header() {
   const router = useRouter();
+
   const { loggedUser } = useContext(UserContext);
-  const { isNavOpen, setIsNavOpen, setIsMultimediaView } =
-    useContext(NavContext);
   const { isPostSelected } = useContext(PostContext);
+  const {
+    isNavOpen,
+    usersSearch,
+    setUsersSearch,
+    setIsUsersListOpen,
+    setIsNavOpen,
+    setScrollBlocked,
+    setIsMultimediaView,
+  } = useContext(NavContext);
 
   function onMainPageClick() {
     setIsMultimediaView(false);
+    setIsNavOpen(false);
     router.push("/");
+    window.scrollTo(0, 0);
+  }
+
+  function onSearchChanges(e: FormEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement;
+    setUsersSearch(target.value);
+  }
+
+  function onInputSelect() {
+    setIsUsersListOpen(true);
+    setScrollBlocked(true);
   }
 
   return (
@@ -38,9 +58,26 @@ export default function Header() {
         />
       </button>
 
+      <div className="xl:hidden flex flex-col gap-4 m-auto">
+        <div className="flex justify-start items-center relative">
+          <FontAwesomeIcon
+            className="text-my-text-light w-4 h-4 left-3 absolute"
+            icon={faMagnifyingGlass}
+          />
+          <input
+            value={usersSearch}
+            onSelect={() => onInputSelect()}
+            onInput={(e) => onSearchChanges(e)}
+            className="bg-my-very-light rounded-md w-full min-w-44 pl-10 py-1"
+            placeholder="search for users.."
+            type="text"
+          />
+        </div>
+      </div>
+
       <button
         onClick={() => onMainPageClick()}
-        className=" m-auto items-center justify-center flex text-center gap-2 "
+        className=" xl:m-auto mr-4 items-center justify-center flex text-center gap-2 "
       >
         <FontAwesomeIcon
           className="bg-my-accent rounded-md px-3 py-1 text-xl font-semibold hover:bg-my-very-light transition-colors duration-300"

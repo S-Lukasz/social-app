@@ -49,7 +49,7 @@ export default function Home() {
         className={
           isMultimediaView
             ? "hidden"
-            : "flex flex-col my-10 gap-10 w-1/3 m-auto"
+            : "flex flex-col my-10 gap-10 2xl:w-1/3 xl:w-2/5 w-11/12 m-auto"
         }
       >
         <button

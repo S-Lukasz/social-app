@@ -9,7 +9,8 @@ import { useRouter } from "next/navigation";
 export default function Nav() {
   const router = useRouter();
 
-  const { isNavOpen, setIsMultimediaView } = useContext(NavContext);
+  const { isNavOpen, setIsNavOpen, setIsMultimediaView } =
+    useContext(NavContext);
   const { loggedUser } = useContext(UserContext);
 
   function onNavItemClick(navType: NavItemType) {
@@ -19,14 +20,19 @@ export default function Nav() {
     } else if (navType === "Multimedia") {
       setIsMultimediaView(true);
       router.push("/");
+    } else if (navType === "UserSettings") {
+      router.push("/settings");
     }
+
+    window.scrollTo(0, 0);
+    setIsNavOpen(false);
   }
 
   return (
     <div
       className={
-        (isNavOpen ? "translate-x" : "-translate-x-60") +
-        " w-1/6 top-14 bottom-0 bg-my-very-dark fixed flex flex-col shadow-md transition-all duration-500 ease-in-out z-10"
+        (isNavOpen ? "translate-x" : "xl:-translate-x-60 -translate-x-full") +
+        " xl:w-1/6 w-full top-14 bottom-0 bg-my-very-dark fixed shadow-md transition-all xl:duration-500 duration-300 ease-in-out z-10"
       }
     >
       <ul>
@@ -35,13 +41,13 @@ export default function Nav() {
             <button
               onClick={() => onNavItemClick(item.type)}
               key={"user_nav_item_key_" + i}
-              className="group"
+              className="group xl:block flex flex-col"
             >
               <div className={item.hasBreakLine ? "flex" : "hidden"}>
                 <div
                   className={
                     (isNavOpen ? "w-5/6 ml-auto mr-5" : "w-2 ml-auto mr-8") +
-                    " h-2 bg-my-accent rounded-full mb-2 transition-all duration-500 ease-in-out"
+                    " h-2 bg-my-accent rounded-full mb-2 transition-all xl:duration-500 duration-300 ease-in-out xl:flex hidden"
                   }
                 />
               </div>
@@ -49,7 +55,7 @@ export default function Nav() {
                 <span
                   className={
                     (isNavOpen ? "w-full" : "w-1/6 overflow-hidden") +
-                    "  text-my-text-light font-bold transition-all duration-500 ease-in-out"
+                    "  text-my-text-light font-bold transition-all xl:duration-500 duration-300 ease-in-out"
                   }
                 >
                   <p
@@ -63,7 +69,7 @@ export default function Nav() {
                   <div
                     className={
                       (isNavOpen ? "left-6" : "left-[16.7rem]") +
-                      " mt-4 absolute transition-all duration-500 ease-in-out"
+                      " mt-4 absolute transition-all xl:duration-500 duration-300 ease-in-out"
                     }
                   >
                     <FontAwesomeIcon
@@ -80,7 +86,7 @@ export default function Nav() {
                 <span
                   className={
                     (isNavOpen ? "w-full" : "w-1/6 overflow-hidden") +
-                    " text-my-text-medium transition-all duration-500 ease-in-out"
+                    " text-my-text-medium transition-all xl:duration-500 duration-300 ease-in-out"
                   }
                 >
                   <p

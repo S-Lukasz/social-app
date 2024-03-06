@@ -51,6 +51,7 @@ interface CommentItemProps {
 interface CommentOptionsProps {
   setEditedComment: Dispatch<SetStateAction<number>>;
   setCommentDescription: Dispatch<SetStateAction<string>>;
+  showComments: boolean;
   editedComment: number;
   comment: PostComment;
   post: UserPostItem;
@@ -112,6 +113,7 @@ export default function PostComments({
               editedComment={editedComment}
               setEditedComment={setEditedComment}
               setCommentDescription={setCommentDescription}
+              showComments={showComments}
               comment={comment}
               post={post}
             ></CommentOptionsView>
@@ -205,6 +207,7 @@ function CommentItem({
           <LikesAndUsers
             setShowLikesView={setShowLikesView}
             showLikesView={showLikesView}
+            isDropDownLeft={true}
             comment={comment}
             refToSet={likesRef}
             post={post}
@@ -262,6 +265,7 @@ function CommentOptionsView({
   setCommentDescription,
   setEditedComment,
   editedComment,
+  showComments,
   comment,
   post,
 }: CommentOptionsProps) {
@@ -320,7 +324,11 @@ function CommentOptionsView({
   return (
     <div
       ref={optionsRef}
-      className={isLoggedUserComment ? "absolute top-4 right-6 " : "hidden"}
+      className={
+        isLoggedUserComment && showComments
+          ? "absolute top-4 right-6"
+          : "hidden"
+      }
     >
       <button
         className={editedComment !== -1 ? "hidden" : ""}

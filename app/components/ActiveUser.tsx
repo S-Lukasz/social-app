@@ -3,15 +3,26 @@
 
 import Link from "next/link";
 import { User } from "../consts";
+import { useContext } from "react";
+import { NavContext } from "./ContextWrapper";
+import { useRouter } from "next/navigation";
 
 interface Props {
   user: User;
 }
 
 export default function ActiveUser({ user }: Props) {
+  const router = useRouter();
+  const { setIsUsersListOpen } = useContext(NavContext);
+
+  function onUserSelect() {
+    router.push(`/users/${user.id}`);
+    setIsUsersListOpen(false);
+  }
+
   return (
-    <Link
-      href={`/users/${user.id}`}
+    <button
+      onClick={() => onUserSelect()}
       className="bg-my-light relative flex items-center p-4 rounded-md w-full duration-300 transition-all hover:bg-my-front-items text-my-accent hover:text-my-text-light"
     >
       <img
@@ -28,6 +39,6 @@ export default function ActiveUser({ user }: Props) {
       <p className="mb-3">
         {user.name} {user.surname}
       </p>
-    </Link>
+    </button>
   );
 }

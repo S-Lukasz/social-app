@@ -71,8 +71,8 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
     >
       <div
         className={
-          (show ? "w-1/3 h-2/6" : "w-0 h-0") +
-          " bg-my-front-items rounded-md m-auto mt-20 items-center p-6 flex flex-col relative transition-all duration-300"
+          (show ? "xl:w-1/3 w-11/12" : "w-0 h-0") +
+          " bg-my-front-items rounded-md m-auto mt-20 items-center xl:p-6 p-4 flex flex-col relative transition-all duration-300"
         }
       >
         <div className={showItems ? "flex flex-col w-full h-full" : "hidden"}>
@@ -97,11 +97,11 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
           <textarea
             value={postDescription}
             onInput={(e) => onDescriptionChange(e)}
-            className="bg-my-dark m-auto w-full min-h-36 max-h-40 rounded-md p-3"
+            className="bg-my-dark xl:m-auto my-6 w-full min-h-36 max-h-40 rounded-md p-3"
             placeholder="Write your post description here!"
           ></textarea>
           <div className="flex justify-between w-full">
-            <button className="flex bg-my-very-light px-4 py-1 rounded-md gap-2 items-center text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark">
+            <button className="flex bg-my-very-light   xl:px-4 px-2 py-1 rounded-md gap-2 items-center text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark">
               <FontAwesomeIcon icon={faUpload}></FontAwesomeIcon>
               <p>Upload image</p>
             </button>
@@ -109,7 +109,7 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
               className={
                 (postDescription.length > maxCharCount
                   ? " text-[#e43e3e] "
-                  : "text-my-text-light ") + "ml-auto pt-1 pr-4"
+                  : "text-my-text-light ") + "ml-auto pt-1 xl:pr-4 pr-3"
               }
             >
               {postDescription.length} / {maxCharCount}

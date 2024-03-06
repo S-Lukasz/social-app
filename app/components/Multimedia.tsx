@@ -31,7 +31,9 @@ export default function Multimedia({ onPostSelected }: Props) {
   return (
     <div
       className={
-        !isMultimediaView ? "hidden" : "flex flex-col my-10 gap-10 w-1/3 m-auto"
+        !isMultimediaView
+          ? "hidden"
+          : "flex flex-col my-10 gap-10 xl:w-1/3 w-11/12 m-auto"
       }
     >
       <div className="flex justify-center gap-10">
@@ -42,7 +44,7 @@ export default function Multimedia({ onPostSelected }: Props) {
             (showSavedPosts
               ? "bg-my-accent"
               : "bg-my-light hover:bg-my-very-light") +
-            " rounded-md px-6 py-1 font-semibold text-lg flex items-center gap-2 "
+            " rounded-md xl:px-6 px-4 py-1 font-semibold text-lg flex items-center gap-2 "
           }
         >
           <FontAwesomeIcon
@@ -61,7 +63,7 @@ export default function Multimedia({ onPostSelected }: Props) {
             (!showSavedPosts
               ? "bg-my-accent"
               : "bg-my-light hover:bg-my-very-light") +
-            " rounded-md px-6 py-1 font-semibold text-lg flex items-center gap-2 "
+            " rounded-md xl:px-6 px-4 py-1 font-semibold text-lg flex items-center gap-2 "
           }
         >
           <FontAwesomeIcon
