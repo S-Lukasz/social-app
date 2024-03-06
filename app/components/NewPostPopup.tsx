@@ -91,7 +91,7 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
             ></FontAwesomeIcon>
           </button>
 
-          <p className="font-medium text-xl text-my-text-light text-center">
+          <p className="font-medium text-xl text-my-text-light text-center xl:mb-3">
             New post creation
           </p>
           <textarea
@@ -100,7 +100,7 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
             className="bg-my-dark xl:m-auto my-6 w-full min-h-36 max-h-40 rounded-md p-3"
             placeholder="Write your post description here!"
           ></textarea>
-          <div className="flex justify-between w-full">
+          <div className="flex justify-between w-full xl:mt-4">
             <button className="flex bg-my-very-light   xl:px-4 px-2 py-1 rounded-md gap-2 items-center text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark">
               <FontAwesomeIcon icon={faUpload}></FontAwesomeIcon>
               <p>Upload image</p>
@@ -123,7 +123,7 @@ export default function NewPostPopup({ setScrollBlocked }: Props) {
                 (postDescription === "" || postDescription.length > maxCharCount
                   ? "pointer-events-none bg-my-light text-my-text-medium"
                   : "pointer-events-auto text-my-accent hover:text-[white] transition-all duration-300 hover:bg-my-dark bg-my-very-light") +
-                " flex  px-4 py-1 rounded-md gap-2 items-center"
+                " flex px-4 py-1 rounded-md gap-2 items-center"
               }
             >
               <p>Submit</p>
