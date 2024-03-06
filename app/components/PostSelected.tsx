@@ -24,7 +24,6 @@ import { PostComment, User, UserPostItem } from "../consts";
 import useClickOutside from "../hooks/useClickOutside";
 import Link from "next/link";
 import PostComments from "./PostComments";
-import { log } from "console";
 
 interface Props {
   post: UserPostItem | undefined;
@@ -74,6 +73,13 @@ export default function PostSelected({
   useEffect(() => {
     setScrollHeight(commentsScrollListRef?.current?.scrollHeight ?? 0);
   }, [post, commentsScrollListRef]);
+
+  useEffect(() => {
+    return () => {
+      setScrollBlocked(false);
+      setIsPostSelected(false);
+    };
+  }, []);
 
   if (!post) return <></>;
 
@@ -191,11 +197,12 @@ export default function PostSelected({
               <FontAwesomeIcon icon={faComment}></FontAwesomeIcon>
             </div>
           </div>
-          <Comments
+          <PostComments
+            showComments={true}
             users={users}
-            commentsRef={commentsScrollListRef}
+            scrollRef={commentsScrollListRef}
             post={post}
-          ></Comments>
+          ></PostComments>
         </div>
       </div>
     </div>
@@ -276,70 +283,70 @@ function LikesAndUsers({
   );
 }
 
-function Comments({ commentsRef, post, users }: CommentsProps) {
-  const [loadLimit, setLoadLimit] = useState(3);
-  const loadOffset = 3;
+// function Comments({ commentsRef, post, users }: CommentsProps) {
+//   const [loadLimit, setLoadLimit] = useState(3);
+//   const loadOffset = 3;
 
-  return (
-    <div className="flex flex-col relative items-center">
-      <div
-        ref={commentsRef}
-        className="flex flex-col bg-my-light gap-2 mb-4 mt-2 w-full transition-all duration-300"
-      >
-        {post.comments.slice(0, loadLimit).map((comment, i) => {
-          const commentUserData = users[comment.userId];
-          return (
-            <div
-              key={"comment_key_" + i + "_on_post_" + comment.userId}
-              className={
-                "bg-my-very-light p-2 rounded-md mx-4 h-full transition-all duration-300"
-              }
-            >
-              <div className={"flex flex-col"}>
-                <div className="flex">
-                  <Link href={`/users/${commentUserData.id}`}>
-                    <img
-                      className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
-                      src={commentUserData.avatarUrl}
-                      alt={"avatar_user_" + commentUserData.id}
-                    />
-                  </Link>
-                  <div className=" mt-1 flex flex-col">
-                    <Link
-                      href={`/users/${commentUserData.id}`}
-                      className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
-                    >
-                      {commentUserData.name} {commentUserData.surname}
-                    </Link>
-                    <p className="text-my-text-light text-sm">
-                      {post.date.toDateString()}
-                    </p>
-                  </div>
-                </div>
+//   return (
+//     <div className="flex flex-col relative items-center">
+//       <div
+//         ref={commentsRef}
+//         className="flex flex-col bg-my-light gap-2 mb-4 mt-2 w-full transition-all duration-300"
+//       >
+//         {post.comments.slice(0, loadLimit).map((comment, i) => {
+//           const commentUserData = users[comment.userId];
+//           return (
+//             <div
+//               key={"comment_key_" + i + "_on_post_" + comment.userId}
+//               className={
+//                 "bg-my-very-light p-2 rounded-md mx-4 h-full transition-all duration-300"
+//               }
+//             >
+//               <div className={"flex flex-col"}>
+//                 <div className="flex">
+//                   <Link href={`/users/${commentUserData.id}`}>
+//                     <img
+//                       className="w-10 h-10 rounded-full mt-2 ml-2 mr-4 hover:border-2 border-my-accent cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+//                       src={commentUserData.avatarUrl}
+//                       alt={"avatar_user_" + commentUserData.id}
+//                     />
+//                   </Link>
+//                   <div className=" mt-1 flex flex-col">
+//                     <Link
+//                       href={`/users/${commentUserData.id}`}
+//                       className="text-my-accent hover:text-my-text-light cursor-pointer duration-300 transition-colors font-medium"
+//                     >
+//                       {commentUserData.name} {commentUserData.surname}
+//                     </Link>
+//                     <p className="text-my-text-light text-sm">
+//                       {post.date.toDateString()}
+//                     </p>
+//                   </div>
+//                 </div>
 
-                <div className=" ml-16 p-2 break-words">
-                  {comment.description}
-                </div>
-              </div>
-            </div>
-          );
-        })}
-        <button
-          onClick={() => setLoadLimit(loadLimit + loadOffset)}
-          className={
-            loadLimit >= post.comments.length
-              ? "hidden"
-              : " cursor-pointer text-my-accent ml-auto mr-10 mb-2 mt-1 flex items-center gap-2 hover:text-[white] transition-all duration-300"
-          }
-        >
-          <p>show more</p>
-          <FontAwesomeIcon icon={faChevronDown}></FontAwesomeIcon>
-        </button>
-        <div className="min-h-[1px]"></div>
-      </div>
-    </div>
-  );
-}
+//                 <div className=" ml-16 p-2 break-words">
+//                   {comment.description}
+//                 </div>
+//               </div>
+//             </div>
+//           );
+//         })}
+//         <button
+//           onClick={() => setLoadLimit(loadLimit + loadOffset)}
+//           className={
+//             loadLimit >= post.comments.length
+//               ? "hidden"
+//               : " cursor-pointer text-my-accent ml-auto mr-10 mb-2 mt-1 flex items-center gap-2 hover:text-[white] transition-all duration-300"
+//           }
+//         >
+//           <p>show more</p>
+//           <FontAwesomeIcon icon={faChevronDown}></FontAwesomeIcon>
+//         </button>
+//         <div className="min-h-[1px]"></div>
+//       </div>
+//     </div>
+//   );
+// }
 
 function UserComment({ loggedUser, post, onPostUpdated }: UserCommentProps) {
   const [commentDescription, setCommentDescription] = useState("");

@@ -3,9 +3,7 @@
 import { useContext } from "react";
 import { NavItemType, USER_NAV_ITEMS } from "../consts";
 import { NavContext, UserContext } from "./ContextWrapper";
-import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/navigation";
 
 export default function Nav() {
@@ -15,10 +13,10 @@ export default function Nav() {
   const { loggedUser } = useContext(UserContext);
 
   function onNavItemClick(navType: NavItemType) {
-    if (navType === NavItemType.UserProfile) {
+    if (navType === "UserProfile") {
       const href = "/users/" + loggedUser.id;
       router.push(href);
-    } else if (navType === NavItemType.Multimedia) {
+    } else if (navType === "Multimedia") {
       setIsMultimediaView(true);
       router.push("/");
     }

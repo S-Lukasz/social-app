@@ -5,6 +5,7 @@ import Link from "next/link";
 import {
   Dispatch,
   FormEvent,
+  RefObject,
   SetStateAction,
   useContext,
   useEffect,
@@ -30,6 +31,7 @@ import useClickOutside from "../hooks/useClickOutside";
 import LikesAndUsers from "./LikesAndUsers";
 
 interface CommentsProps {
+  scrollRef?: RefObject<HTMLDivElement>;
   showComments: boolean;
   post: UserPostItem;
   users: User[];
@@ -55,6 +57,7 @@ interface CommentOptionsProps {
 }
 
 export default function PostComments({
+  scrollRef,
   showComments,
   post,
   users,
@@ -88,6 +91,7 @@ export default function PostComments({
 
   return (
     <div
+      ref={scrollRef}
       className={
         (showComments ? "flex flex-col bg-my-light gap-3 mb-4" : " h-0") +
         " transition-all duration-300"
@@ -192,7 +196,7 @@ function CommentItem({
         className={
           editedComment === comment.id && editedComment !== -1
             ? "hidden"
-            : "ml-16 p-2 break-words"
+            : "ml-16 py-2 mr-14 break-words"
         }
       >
         {comment.description}

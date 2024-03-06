@@ -18,13 +18,12 @@ import {
   faUserMinus,
 } from "@fortawesome/free-solid-svg-icons";
 
-export enum NavItemType {
-  UserProfile,
-  UserSettings,
-  Multimedia,
-  Other,
-  LogOut,
-}
+export type NavItemType =
+  | "UserProfile"
+  | "UserSettings"
+  | "Multimedia"
+  | "Other"
+  | "LogOut";
 
 export enum UserProfileInfoType {
   Date,
@@ -297,21 +296,21 @@ export const USER_NAV_ITEMS: UserNavItem[] = [
     name: "My profile",
     description: "Edit photos, manage friends and create new posts.",
     hasBreakLine: false,
-    type: NavItemType.UserProfile,
+    type: "UserProfile",
     icon: faUser,
   },
   {
     name: "Settings",
     description: "Setup your privacy, manage preferences and more.",
     hasBreakLine: true,
-    type: NavItemType.UserSettings,
+    type: "UserSettings",
     icon: faGear,
   },
   {
     name: "Multimedia",
     description: "Manage your saved posts and other multimedia features.",
     hasBreakLine: false,
-    type: NavItemType.Multimedia,
+    type: "Multimedia",
     icon: faPhotoFilm,
   },
   {
@@ -319,12 +318,79 @@ export const USER_NAV_ITEMS: UserNavItem[] = [
     description:
       "Ends the access to your profile on a website. Come back soon!",
     hasBreakLine: true,
-    type: NavItemType.LogOut,
+    type: "LogOut",
     icon: faRightFromBracket,
   },
 ];
 
 export const USER_POST_ITEMS: UserPostItem[] = [
+  {
+    id: 4,
+    userId: 4,
+    likes: [1, 2, 3],
+    date: new Date(),
+    description: "Last year was really nice!",
+    imageUrl: "/posts/post_image_temp_3.png",
+    comments: [
+      {
+        id: 0,
+        userId: 1,
+        likes: [1, 2],
+        date: new Date(),
+        description: "Yeah 😊",
+      },
+      {
+        id: 1,
+        userId: 2,
+        likes: [1, 2],
+        date: new Date(),
+        description: "Wow! Really nice 😄.",
+      },
+    ],
+  },
+  {
+    id: 1,
+    userId: 0,
+    likes: [1, 2, 3],
+    date: new Date(),
+    description:
+      "🌟 Hey everyone! 🌟 Just tried out a new recipe for avocado toast with a twist – added some sriracha and feta! 🔥🥑 Absolutely loved it! What's your go-to toast topping? Share your favorites below! 👇😊",
+    comments: [
+      {
+        id: 0,
+        userId: 1,
+        likes: [1, 2],
+        date: new Date(),
+        description:
+          "Yum! I'm all about the classic peanut butter and banana combo.",
+      },
+      {
+        id: 1,
+        userId: 2,
+        likes: [1, 2],
+        date: new Date(),
+        description:
+          "That sounds amazing! I'm a sucker for smashed avocado with cherry tomatoes and a sprinkle of sea salt. 🍅🧂",
+      },
+      {
+        id: 2,
+        userId: 1,
+        likes: [1, 2],
+        date: new Date(),
+        description:
+          "Avocado toast with poached eggs and a drizzle of balsamic glaze is my absolute favorite! 🥑",
+      },
+      {
+        id: 3,
+        userId: 0,
+        likes: [1, 2, 3],
+        date: new Date(),
+        description:
+          " Interesting twist! I recently discovered goat cheese and honey on my toast – sweet and savory heaven! 🍯🧀",
+      },
+    ],
+  },
+
   {
     id: 0,
     userId: 0,
@@ -350,45 +416,6 @@ export const USER_POST_ITEMS: UserPostItem[] = [
     ],
   },
   {
-    id: 1,
-    userId: 0,
-    likes: [1],
-    date: new Date(),
-    description: "User post item description 2.",
-    comments: [
-      {
-        id: 0,
-        userId: 1,
-
-        likes: [1, 2],
-        date: new Date(),
-        description: "comment description 1 lorem ipsum",
-      },
-      {
-        id: 1,
-        userId: 2,
-
-        likes: [1],
-        date: new Date(),
-        description: "comment description 2 lorem ipsum",
-      },
-      {
-        id: 2,
-        userId: 1,
-        likes: [],
-        date: new Date(),
-        description: "comment description 3 lorem ipsum",
-      },
-      {
-        id: 3,
-        userId: 3,
-        likes: [0, 2],
-        date: new Date(),
-        description: "comment description 4 lorem ipsum",
-      },
-    ],
-  },
-  {
     id: 2,
     userId: 2,
     likes: [1, 0, 3, 2],
@@ -408,61 +435,32 @@ export const USER_POST_ITEMS: UserPostItem[] = [
   {
     id: 3,
     userId: 1,
-    likes: [1, 2, 3],
+    likes: [1],
     date: new Date(),
-    description: "User post item description 4.",
+    description: "I like cats! 😽",
     comments: [
       {
         id: 0,
         userId: 1,
+
         likes: [1, 2],
         date: new Date(),
-        description: "comment description 1",
+        description: "Me too!",
       },
       {
         id: 1,
         userId: 2,
-        likes: [1, 2],
+
+        likes: [1],
         date: new Date(),
-        description: "comment description 2",
+        description: "I prefer dogs..",
       },
       {
         id: 2,
         userId: 1,
-        likes: [1, 2],
+        likes: [],
         date: new Date(),
-        description: "comment description 3",
-      },
-      {
-        id: 3,
-        userId: 0,
-        likes: [1, 2, 3],
-        date: new Date(),
-        description: "comment description 4",
-      },
-    ],
-  },
-  {
-    id: 4,
-    userId: 4,
-    likes: [1, 2, 3],
-    date: new Date(),
-    description: "Last year was really nice!",
-    imageUrl: "/posts/post_image_temp_3.png",
-    comments: [
-      {
-        id: 0,
-        userId: 1,
-        likes: [1, 2],
-        date: new Date(),
-        description: "Yeah 😊",
-      },
-      {
-        id: 1,
-        userId: 2,
-        likes: [1, 2],
-        date: new Date(),
-        description: "Wow! Really nice 😄.",
+        description: "Meow!",
       },
     ],
   },
