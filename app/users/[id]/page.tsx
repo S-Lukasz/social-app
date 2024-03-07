@@ -7,10 +7,23 @@ import Post from "@/app/components/Post";
 import PostSelected from "@/app/components/PostSelected";
 import { UserPostItem, UserProfileData } from "@/app/consts";
 import useDisableScroll from "@/app/hooks/useDisableScroll";
-import { faChevronDown, faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faEdit,
+  faPlus,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 export default function UserPage({ params }: { params: { id: number } }) {
   const { loggedUser, users, setloggedUser, onUserUpdated } =
@@ -26,7 +39,10 @@ export default function UserPage({ params }: { params: { id: number } }) {
   const userData = users[params.id];
   const commentsScrollListRef = useRef<HTMLDivElement>(null);
 
+  const [userName, setUserName] = useState(userData.name);
+  const [userSurname, setUserSurname] = useState(userData.surname);
   const [loadLimit, setLoadLimit] = useState(9);
+  const [isEditEnabled, setIsEditEnabled] = useState(false);
   const [scrollHeight, setScrollHeight] = useState(0);
   const [userPosts, setUserPosts] = useState<UserPostItem[]>([]);
   const [postSelectedId, setPostSelectedId] = useState<number>();
@@ -40,11 +56,27 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   function onUserActionButton() {
     if (userData.id === loggedUser.id) {
+      if (isEditEnabled) {
+        saveEditedData();
+        setIsEditEnabled(false);
+      } else {
+        setIsEditEnabled(true);
+      }
     } else if (loggedUser.friends.includes(userData.id)) {
       removeFriend(userData.id);
     } else {
       addFriend(userData.id);
     }
+  }
+
+  function saveEditedData() {
+    const userClone = {
+      ...loggedUser,
+      name: userName,
+      surname: userSurname,
+    };
+
+    onUserUpdated(userClone);
   }
 
   function addFriend(userID: number) {
@@ -88,13 +120,22 @@ export default function UserPage({ params }: { params: { id: number } }) {
 
   useEffect(() => {
     if (userData.id === loggedUser.id) {
-      setUserActionButtonText("Edit profile");
+      if (isEditEnabled) setUserActionButtonText("Save changes");
+      else setUserActionButtonText("Edit profile");
     } else if (loggedUser.friends.includes(userData.id)) {
       setUserActionButtonText("Remove friend");
     } else {
       setUserActionButtonText("Send invite");
     }
-  }, [userData, loggedUser]);
+  }, [userData, loggedUser, isEditEnabled]);
+
+  function onInputTextChanged(
+    e: FormEvent<HTMLInputElement>,
+    setVoid: Dispatch<SetStateAction<string>>
+  ) {
+    const target = e.target as HTMLInputElement;
+    setVoid(target.value);
+  }
 
   return (
     <div className="bg-my-front-items flex w-full min-h-screen relative">
@@ -107,28 +148,81 @@ export default function UserPage({ params }: { params: { id: number } }) {
       ></PostSelected>
 
       <div className="flex flex-col pb-4 mx-auto xl:w-2/3 w-11/12">
-        <div className="flex rounded-md bg-my-light xl:p-4 p-2 m-4 ">
+        <div className="flex rounded-md bg-my-light xl:p-4 p-3 m-4 ">
           <img
-            className="xl:w-32 xl:h-32 w-24 h-24 rounded-full mt-2 ml-2 mr-4 cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
+            className="xl:w-32 xl:h-32 w-24 h-24 rounded-full mt-2 ml-2 xl:mr-4 mr-2 cursor-pointer duration-100 transition-all scale:110 hover:scale-100"
             src={userData.avatarUrl}
             alt={"avatar_user_" + userData.id}
           />
-          <div className="flex xl:flex-row flex-col  w-full justify-between">
+          <div className="flex xl:flex-row flex-col w-full justify-between">
             <div className="flex flex-col m-4">
-              <span className="font-semibold text-2xl">
-                {userData.name} {userData.surname}
-              </span>
-              <span className="font-medium xl:text-lg text-my-text-light ">
-                {userData.description}
+              <div className="font-semibold text-2xl">
+                <span className={isEditEnabled ? "hidden" : "flex"}>
+                  {userData.name} {userData.surname}
+                </span>
+                <div
+                  className={
+                    isEditEnabled ? "flex flex-col gap-2 mb-1" : "hidden"
+                  }
+                >
+                  <div className="flex xl:max-w-44 max-w-40 items-center gap-3">
+                    <input
+                      className="rounded-md px-4 py-1 xl:max-w-44 max-w-40 bg-my-front-items "
+                      onInput={(e) => onInputTextChanged(e, setUserName)}
+                      value={userName}
+                      placeholder="Name"
+                    ></input>
+                    <FontAwesomeIcon
+                      className="h-6 w-6 text-my-text-light"
+                      icon={faEdit}
+                    ></FontAwesomeIcon>
+                  </div>
+
+                  <div className="flex xl:max-w-44 max-w-40 items-center gap-3">
+                    <input
+                      className="rounded-md px-4 py-1 xl:max-w-44 max-w-40 bg-my-front-items "
+                      onInput={(e) => onInputTextChanged(e, setUserSurname)}
+                      value={userSurname}
+                      placeholder="Surname"
+                    ></input>
+                    <FontAwesomeIcon
+                      className="h-6 w-6 text-my-text-light"
+                      icon={faEdit}
+                    ></FontAwesomeIcon>
+                  </div>
+                </div>
+              </div>
+              <span className="font-normal xl:text-lg text-my-text-light ">
+                <span>{userData.description}</span>
               </span>
             </div>
 
-            <button
-              onClick={() => onUserActionButton()}
-              className="m-2 xl:m-0 px-6 h-8 font-medium text-lg text-center rounded-md bg-my-accent hover:bg-my-very-light duration-300 transition-colors"
-            >
-              {userActionButtonText}
-            </button>
+            <div className="flex xl:m-0 ml-auto gap-3 mb-2">
+              <button
+                onClick={() => setIsEditEnabled(false)}
+                className={
+                  isEditEnabled
+                    ? "px-2 h-8 font-medium text-lg text-center rounded-md bg-my-front-items hover:bg-my-very-light duration-300 transition-colors"
+                    : "hidden"
+                }
+              >
+                Cancel
+              </button>
+              <button
+                disabled={
+                  isEditEnabled && (userName === "" || userSurname === "")
+                }
+                onClick={() => onUserActionButton()}
+                className={
+                  (isEditEnabled && (userName === "" || userSurname === "")
+                    ? "bg-my-front-items text-my-text-medium"
+                    : "bg-my-accent hover:bg-my-very-light") +
+                  " px-2 h-8 font-medium text-lg text-center rounded-md duration-300 transition-colors text-nowrap"
+                }
+              >
+                {userActionButtonText}
+              </button>
+            </div>
           </div>
         </div>
 
